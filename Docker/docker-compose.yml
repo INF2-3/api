@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   mongodb:
-    image : mongo:latest #Use the latest image.
+    image : mongo:4.4.19-rc2 #Use the latest image.
     container_name: mongodb
     restart: unless-stopped
 
@@ -10,13 +10,12 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password 
     volumes: # to preserve datbase after container is deleted.
       - ./database-data/mongodb :/data/db
-    ports:
-      - 27017:27017
+    
 
     
   #Mongo Express Service
   mongo-express:
-    image: mongo-express:latest
+    image: mongo-express:0.54.0
     container_name: mongo-express
     restart: unless-stopped
     ports:
@@ -26,27 +25,27 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
       ME_CONFIG_MONGODB_SERVER: mongodb # use the name of the mongo container
       
-
   postgres: 
-    image: postgres:latest
+    image: postgres:10-alpine
     container_name: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: root        
+      POSTGRES_PASSWORD: changeme        
+      POSTGRES_DB: mydb
     volumes:
       - /database-data/postgres:/data/db
     ports:
         - 5432:5432
-        
-  pg-admin:
-    image: dpage/pgadmin4f:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: adming@email.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_DEFAULT_PORT: 5050
+ 
+ 
+  adminer:
+    image: adminer
+    restart: unless-stopped
     ports:
-      - 5050:5050
+      - 8080:8080
+    depends_on:
+      - postgres
 
 
 volumes:
