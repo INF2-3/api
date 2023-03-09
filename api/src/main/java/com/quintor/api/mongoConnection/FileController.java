@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-//@CrossOrigin("*")
 public class FileController {
     FileService fileService;
 
@@ -18,11 +17,9 @@ public class FileController {
     }
 
     @PostMapping("/add")
-    public String addFile(@RequestParam("title") String title, @RequestParam("file")MultipartFile file) throws IOException {
-        String id = fileService.addFile(title, file);
-
-
-        return "Er is iets gelukt";
+    public String addFile(@RequestParam("file")MultipartFile file) throws IOException {
+        String id = fileService.addFile("test", file);
+        return "test";
     }
 
     @GetMapping("/get/{id}")
