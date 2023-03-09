@@ -1,4 +1,4 @@
-package com.quintor.mongoConnection;
+package com.quintor.api.mongoConnection;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

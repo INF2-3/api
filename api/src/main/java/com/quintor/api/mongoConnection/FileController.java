@@ -1,4 +1,4 @@
-package com.quintor.mongoConnection;
+package com.quintor.api.mongoConnection;
 
 import ch.qos.logback.core.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,17 +8,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@CrossOrigin("*")
-@RequestMapping("mt940")
+//@CrossOrigin("*")
 public class FileController {
-
-    @Autowired
     FileService fileService;
 
+    @Autowired
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
+    }
+
     @PostMapping("/add")
-    public String addFile(@RequestParam("title") String title, @RequestParam("file")MultipartFile file, Model model) throws IOException {
+    public String addFile(@RequestParam("title") String title, @RequestParam("file")MultipartFile file) throws IOException {
         String id = fileService.addFile(title, file);
-        System.out.println("Ik ben bij /add");
+
+
         return "Er is iets gelukt";
     }
 

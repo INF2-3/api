@@ -1,6 +1,5 @@
-package com.quintor.mongoConnection;
+package com.quintor.api.mongoConnection;
 
-import jdk.incubator.vector.VectorOperators;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
