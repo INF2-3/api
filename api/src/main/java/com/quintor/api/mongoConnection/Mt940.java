@@ -1,21 +1,20 @@
 package com.quintor.api.mongoConnection;
 
-import org.bson.types.Binary;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.Id;
-
-@Document(collection = "files")
+import java.time.LocalDate;
+//@Document("files")
 public class Mt940 {
-    @Id
+//    @Id
     private String id;
+    private MultipartFile file;
+    private LocalDate uploadDate;
 
-    private String title;
-
-    private Binary file;
-
-    public Mt940(String title) {
-        this.title = title;
+    public Mt940(MultipartFile file, LocalDate uploadDate) {
+        this.file = file;
+        this.uploadDate = uploadDate;
     }
 
     public String getId() {
@@ -26,19 +25,19 @@ public class Mt940 {
         this.id = id;
     }
 
-    public String getTitle() {
-        return this.title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Binary getFile() {
+    public MultipartFile getFile() {
         return this.file;
     }
 
-    public void setFile(Binary file) {
+    public void setFile(MultipartFile file) {
         this.file = file;
+    }
+
+    public LocalDate getUploadDate() {
+        return this.uploadDate;
+    }
+
+    public void setUploadDate(LocalDate uploadDate) {
+        this.uploadDate = uploadDate;
     }
 }
