@@ -4,6 +4,8 @@ services:
     image : mongo:4.4.19-rc2 #Use the latest image.
     container_name: mongodb
     restart: unless-stopped
+    ports:
+      - 27017:27017
 
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
