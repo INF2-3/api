@@ -1,20 +1,18 @@
 package com.quintor.api.mongoConnection;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.Id;
 import java.time.LocalDate;
-//@Document("files")
+@Document(collection = "files")
 public class Mt940 {
-//    @Id
+    @Id
     private String id;
-    private MultipartFile file;
+    private String file;
     private LocalDate uploadDate;
 
-    public Mt940(MultipartFile file, LocalDate uploadDate) {
+    public Mt940(String file) {
         this.file = file;
-        this.uploadDate = uploadDate;
     }
 
     public String getId() {
@@ -25,19 +23,19 @@ public class Mt940 {
         this.id = id;
     }
 
-    public MultipartFile getFile() {
-        return this.file;
-    }
-
-    public void setFile(MultipartFile file) {
-        this.file = file;
-    }
-
     public LocalDate getUploadDate() {
         return this.uploadDate;
     }
 
     public void setUploadDate(LocalDate uploadDate) {
         this.uploadDate = uploadDate;
+    }
+
+    public String getFile() {
+        return this.file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
     }
 }
