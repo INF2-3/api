@@ -23,9 +23,9 @@ public class Mt940Controller {
     }
 
     @PostMapping("/insert")
-    public String insertMt940(@RequestParam("file") MultipartFile file) throws IOException {
+    public String insertMt940(@RequestParam("file") MultipartFile file, @RequestParam("userId") int userId) throws IOException {
         String document = new String(file.getBytes(), StandardCharsets.UTF_8);
-        mt940Service.insertMt940(new Mt940(document));
+        mt940Service.insertMt940(new Mt940(document, userId));
         return document;
     }
 }
