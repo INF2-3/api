@@ -23,9 +23,23 @@ public class Mt940Controller {
     }
 
     @PostMapping("/insert")
-    public String insertMt940(@RequestParam("file") MultipartFile file, @RequestParam("userId") int userId) throws IOException {
+    public Object insertMt940(@RequestParam("file") MultipartFile file, @RequestParam("userId") int userId) throws IOException {
+        if(file== null || file.isEmpty()) {
+            return "Er is geen file";
+        }
+        if(userId <= 0 ){
+            return "Geen geldig user id";
+        }
         String document = new String(file.getBytes(), StandardCharsets.UTF_8);
         mt940Service.insertMt940(new Mt940(document, userId));
-        return document;
+        return file.getInputStream();
+    }
+
+    private boolean isValidFile(MultipartFile file) {
+        if(file == null || file.isEmpty()){
+            return false;
+        }
+        file.getContentType();
+        return true;
     }
 }
