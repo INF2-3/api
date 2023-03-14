@@ -32,14 +32,6 @@ public class Mt940Controller {
         }
         String document = new String(file.getBytes(), StandardCharsets.UTF_8);
         mt940Service.insertMt940(new Mt940(document, userId));
-        return file.getInputStream();
-    }
-
-    private boolean isValidFile(MultipartFile file) {
-        if(file == null || file.isEmpty()){
-            return false;
-        }
-        file.getContentType();
-        return true;
+        return document;
     }
 }
