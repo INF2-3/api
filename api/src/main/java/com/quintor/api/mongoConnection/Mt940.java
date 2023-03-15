@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
 
+//declares the collection of the database
 @Document(collection = "file")
 public class Mt940 {
     @Id
