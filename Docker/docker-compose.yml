@@ -4,11 +4,13 @@ services:
     image : mongo:4.4.19-rc2 #Use the latest image.
     container_name: mongodb
     restart: unless-stopped
+    ports:
+      - 27017:27017
 
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password 
-    volumes: # to preserve datbase after container is deleted.
+    volumes: # to preserve database after container is deleted.
       - ./database-data/mongodb:/data/db
     
 
