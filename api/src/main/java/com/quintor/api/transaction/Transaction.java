@@ -3,9 +3,11 @@ package com.quintor.api.transaction;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "transaction")
 public class Transaction {
     @Id
     @Column
