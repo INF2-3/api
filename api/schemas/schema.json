@@ -91,10 +91,14 @@
             ],
             "properties": {
               "date": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 6,
+                "minLength": 6
               },
               "currency": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 3,
+                "minLength": 3
               },
               "amount": {
                 "type": "string"
@@ -123,6 +127,8 @@
             },
             "date": {
               "type": "string",
+              "maxLength": 6,
+              "minLength": 6,
               "default": ""
             },
             "description": {
@@ -131,6 +137,8 @@
             },
             "currency": {
               "type": "string",
+              "maxLength": 3,
+              "minLength": 3,
               "default": ""
             },
             "amount": {
@@ -139,6 +147,7 @@
             },
             "dCMark": {
               "type": "string",
+              "enum": ["C", "D"],
               "default": ""
             }
           }
@@ -207,6 +216,8 @@
             },
             "date": {
               "type": "string",
+              "maxLength": 6,
+              "minLength": 6,
               "default": ""
             },
             "description": {
@@ -215,6 +226,8 @@
             },
             "currency": {
               "type": "string",
+              "maxLength": 3,
+              "minLength": 3,
               "default": ""
             },
             "amount": {
@@ -223,6 +236,7 @@
             },
             "dCMark": {
               "type": "string",
+              "enum": ["C", "D"],
               "default": ""
             }
           }
@@ -253,7 +267,9 @@
               "type": "string"
             },
             "entryDate": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 4,
+              "minLength": 4
             },
             "informationToAccountOwner": {
               "title": "Schema for the optional 86 tag inside a transaction (61 tag)",
@@ -333,7 +349,9 @@
               "type": "string"
             },
             "valueDate": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 6,
+              "minLength": 6
             },
             "referenceForTheAccountOwner": {
               "type": "string"
@@ -376,13 +394,17 @@
           ],
           "properties": {
             "date": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 6,
+              "minLength": 6
             },
             "description": {
               "type": "string"
             },
             "currency": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 3,
+              "minLength": 3
             },
             "amount": {
               "type": "string"
@@ -391,7 +413,8 @@
               "type": "string"
             },
             "dCMark": {
-              "type": "string"
+              "type": "string",
+              "enum": ["C", "D"]
             }
           }
         }
