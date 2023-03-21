@@ -1,5 +1,8 @@
 package com.quintor.api.transaction;
 
+import com.quintor.api.category.Category;
+import com.quintor.api.description.Description;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -20,21 +23,21 @@ public class Transaction {
     private String referenceOwner;
     private String institutionReference;
     private String supplementaryDetails;
-    private int originalDescriptionId;
+    private Description originalDescription;
     private String description;
     private int fileId;
-    private int categoryId;
+    private Category category;
 
-    public Transaction(int id, LocalDate valueDate, int entryDate, DebitOrCredit debitOrCredit, double amount, String transactionCode, int originalDescriptionId, int fileId, int categoryId) {
+    public Transaction(int id, LocalDate valueDate, int entryDate, DebitOrCredit debitOrCredit, double amount, String transactionCode, Description originalDescription, int fileId, Category category) {
         setId(id);
         setValueDate(valueDate);
         setEntryDate(entryDate);
         setDebitOrCredit(debitOrCredit);
         setAmount(amount);
         setTransactionCode(transactionCode);
-        setOriginalDescriptionId(originalDescriptionId);
+        setOriginalDescription(originalDescription);
         setFileId(fileId);
-        setCategoryId(categoryId);
+        setCategory(category);
     }
 
     public int getId() {
@@ -121,12 +124,15 @@ public class Transaction {
         this.supplementaryDetails = supplementaryDetails;
     }
 
-    public int getOriginalDescriptionId() {
-        return this.originalDescriptionId;
+    public Description getOriginalDescription() {
+        return this.originalDescription;
     }
 
-    public void setOriginalDescriptionId(int originalDescriptionId) {
-        this.originalDescriptionId = originalDescriptionId;
+    public void setOriginalDescription(Description originalDescription) {
+        if (originalDescription == null) {
+            return;
+        }
+        this.originalDescription = originalDescription;
     }
 
     public String getDescription() {
@@ -148,11 +154,11 @@ public class Transaction {
         this.fileId = fileId;
     }
 
-    public int getCategoryId() {
-        return this.categoryId;
+    public Category getCategory() {
+        return this.category;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
