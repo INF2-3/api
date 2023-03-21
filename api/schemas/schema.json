@@ -80,7 +80,6 @@
         "forwardAvailableBalance": {
           "description": "Schema for optional tag 65",
           "type": "array",
-          "default": [],
           "items": {
             "type": "object",
             "required": [
@@ -101,7 +100,9 @@
                 "minLength": 3
               },
               "amount": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+                "description": "This pattern checks if amount is a number greater than or equal to 0"
               },
               "dCMark": {
                 "type": "string"
@@ -123,32 +124,30 @@
           "properties": {
             "name": {
               "type": "string",
-              "default": ""
+              "default": "64"
             },
             "date": {
               "type": "string",
               "maxLength": 6,
-              "minLength": 6,
-              "default": ""
+              "minLength": 6
             },
             "description": {
               "type": "string",
-              "default": ""
+              "default": "This tag specifies for the closing available balance, whether it is a debit or credit\nbalance, the date, the currency and the amount of the balance"
             },
             "currency": {
               "type": "string",
               "maxLength": 3,
-              "minLength": 3,
-              "default": ""
+              "minLength": 3
             },
             "amount": {
               "type": "string",
-              "default": ""
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "description": "This pattern checks if amount is a number greater than or equal to 0"
             },
             "dCMark": {
               "type": "string",
-              "enum": ["C", "D"],
-              "default": ""
+              "enum": ["C", "D"]
             }
           }
         },
@@ -163,15 +162,17 @@
           "properties": {
             "name": {
               "type": "string",
-              "default": ""
+              "default": "25"
             },
             "accountNumber": {
               "type": "string",
-              "default": ""
+              "minLength": 21,
+              "maxLength": 21,
+              "description": "Schema for account number only for Netherlands, which is IBAN + ISO currency code"
             },
             "description": {
               "type": "string",
-              "default": ""
+              "default": "This tag identifies the account for which the statement is sent"
             }
           }
         },
@@ -186,7 +187,7 @@
           "properties": {
             "name": {
               "type": "string",
-              "default": ""
+              "default": "20"
             },
             "referenceNumber": {
               "type": "string",
@@ -194,7 +195,7 @@
             },
             "description": {
               "type": "string",
-              "default": ""
+              "default": "This tag specifies the reference assigned by the Sender to unambiguously identify\\nthe message."
             }
           }
         },
@@ -212,32 +213,29 @@
           "properties": {
             "name": {
               "type": "string",
-              "default": ""
+              "default": "62F"
             },
             "date": {
               "type": "string",
               "maxLength": 6,
-              "minLength": 6,
-              "default": ""
+              "minLength": 6
             },
             "description": {
-              "type": "string",
-              "default": ""
+              "type": "string"
             },
             "currency": {
               "type": "string",
               "maxLength": 3,
-              "minLength": 3,
-              "default": ""
+              "minLength": 3
             },
             "amount": {
               "type": "string",
-              "default": ""
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "description": "This pattern checks if amount is a number greater than or equal to 0"
             },
             "dCMark": {
               "type": "string",
-              "enum": ["C", "D"],
-              "default": ""
+              "enum": ["C", "D"]
             }
           }
         },
@@ -249,12 +247,10 @@
             "identificationCode",
             "amount",
             "entryDate",
-            "supplementaryDetails",
             "name",
             "debitCreditMark",
             "valueDate",
             "referenceForTheAccountOwner",
-            "referenceOfTheAccountServicingInstitution"
           ],
           "properties": {
             "transactionType": {
@@ -264,7 +260,9 @@
               "type": "string"
             },
             "amount": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "description": "This pattern checks if amount is a number greater than or equal to 0"
             },
             "entryDate": {
               "type": "string",
@@ -293,46 +291,60 @@
               ],
               "properties": {
                 "paymentInformationId": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "ultimateCreditor": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "endToEndReference": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "ultimateDebitor": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "counterPartyId": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "mandateReference": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "charges": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "accountOwnerInformationInOneLine": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "remittanceInformation": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "exchangeRate": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "returnReason": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "purposeCode": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "clientReference": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "instructionId": {
-                  "type": "string"
+                  "type": "string",
+                  "default": ""
                 },
                 "creditorId": {
                   "type": "string"
@@ -357,7 +369,9 @@
               "type": "string"
             },
             "referenceOfTheAccountServicingInstitution": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 16,
+              "minLength": 16
             }
           }
         },
@@ -377,7 +391,8 @@
               "type": "string"
             },
             "description": {
-              "type": "string"
+              "type": "string",
+              "default": "This tag contains the sequential number of the statement"
             }
           }
         },
@@ -389,17 +404,19 @@
             "description",
             "currency",
             "amount",
-            "tag",
+            "name",
             "dCMark"
           ],
           "properties": {
+
             "date": {
               "type": "string",
               "maxLength": 6,
               "minLength": 6
             },
             "description": {
-              "type": "string"
+              "type": "string",
+              "default": "This tag specifies, for the opening balance, whether it is a debit or credit balance,\\nthe date, the currency and the amount of the balance."
             },
             "currency": {
               "type": "string",
@@ -407,10 +424,13 @@
               "minLength": 3
             },
             "amount": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "description": "This pattern checks if amount is a number greater than or equal to 0"
             },
-            "tag": {
-              "type": "string"
+            "name": {
+              "type": "string",
+              "default": "60F"
             },
             "dCMark": {
               "type": "string",
