@@ -187,6 +187,40 @@
                                     </xs:sequence>
                                 </xs:complexType>
                             </xs:element>
+                            <xs:element name="generalInformationToAccountOwner">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:string" name="numberOfDebitEntries">
+                                            <xs:simpleType>
+                                                <xs:restriction>
+                                                    <xs:pattern value="^([0-9]\d*)?$"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="numberOfCreditEntries">
+                                            <xs:simpleType>
+                                                <xs:restriction>
+                                                    <xs:pattern value="^([0-9]\d*)?$"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="debitEntriesTotalAmount">
+                                            <xs:simpleType>
+                                                <xs:restriction>
+                                                    <xs:pattern value="^(0|[1-9]\d*)(,\d+)?$"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="creditEntriesTotalAmount">
+                                            <xs:simpleType>
+                                                <xs:restriction>
+                                                    <xs:pattern value="^(0|[1-9]\d*)(,\d+)?$"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

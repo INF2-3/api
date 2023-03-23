@@ -151,6 +151,34 @@
             }
           }
         },
+        "generalInformationToAccountOwner": {
+          "description": "Schema for optional tag 86 at the end of the mt940 file",
+          "type": "object",
+          "required": [
+            "numberOfDebitEntries",
+            "numberOfCreditEntries",
+            "debitEntriesTotalAmount",
+            "creditEntriesTotalAmount"
+          ],
+          "properties": {
+            "numberOfDebitEntries": {
+              "type": "string",
+              "pattern": "^([0-9]\\d*)?$"
+            },
+            "numberOfCreditEntries": {
+              "type": "string",
+              "pattern": "^([0-9]\\d*)?$"
+            },
+            "debitEntriesTotalAmount": {
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$"
+            },
+            "creditEntriesTotalAmount": {
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$"
+            }
+          }
+        },
         "accountIdentification": {
           "description": "Schema for mandatory tag 25",
           "type": "object",
@@ -250,7 +278,7 @@
             "name",
             "debitCreditMark",
             "valueDate",
-            "referenceForTheAccountOwner",
+            "referenceForTheAccountOwner"
           ],
           "properties": {
             "transactionType": {
