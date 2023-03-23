@@ -1,4 +1,4 @@
-package com.quintor.api.description;
+package com.quintor.api.dataobjects;
 
 public class Description {
     private int descriptionId;

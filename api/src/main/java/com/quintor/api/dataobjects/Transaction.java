@@ -1,30 +1,34 @@
-package com.quintor.api.transaction;
+package com.quintor.api.dataobjects;
 
-import com.quintor.api.category.Category;
-import com.quintor.api.description.Description;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "transaction")
 public class Transaction {
     @Id
-    @Column
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @Column(name = "valueDate")
     private LocalDate valueDate;
+    @Column(name = "entryDate")
     private int entryDate;
+    @Column(name = "debitOrCredit")
     private DebitOrCredit debitOrCredit;
+    @Column(name = "amount")
     private double amount;
+    @Column(name = "transactionCode")
     private String transactionCode;
+    @Column(name = "referenceOwner")
     private String referenceOwner;
+    @Column(name = "institutionReference")
     private String institutionReference;
+    @Column(name = "supplementaryDetails")
     private String supplementaryDetails;
     private Description originalDescription;
+    @Column(name = "description")
     private String description;
+    @Column(name = "fileId")
     private int fileId;
     private Category category;
 

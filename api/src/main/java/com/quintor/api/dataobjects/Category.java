@@ -1,4 +1,4 @@
-package com.quintor.api.category;
+package com.quintor.api.dataobjects;
 
 public class Category {
     private int categoryId;

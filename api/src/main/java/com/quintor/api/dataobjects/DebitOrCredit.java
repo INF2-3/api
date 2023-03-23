@@ -1,4 +1,4 @@
-package com.quintor.api.transaction;
+package com.quintor.api.dataobjects;
 
 public enum DebitOrCredit {
     DEBIT,
