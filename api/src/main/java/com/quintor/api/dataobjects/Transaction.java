@@ -13,8 +13,8 @@ public class Transaction {
     private LocalDate valueDate;
     @Column(name = "entryDate")
     private int entryDate;
-    @Column(name = "debitOrCredit")
-    private DebitOrCredit debitOrCredit;
+    @Column(name = "debit/credit")
+    private String debitOrCredit;
     @Column(name = "amount")
     private double amount;
     @Column(name = "transactionCode")
@@ -25,14 +25,18 @@ public class Transaction {
     private String institutionReference;
     @Column(name = "supplementaryDetails")
     private String supplementaryDetails;
+    @Column(name = "originalDescriptionId")
+    private int originalDescriptionId;
     private Description originalDescription;
     @Column(name = "description")
     private String description;
     @Column(name = "fileId")
     private int fileId;
+    @Column(name = "categoryId")
+    private int categoryId;
     private Category category;
 
-    public Transaction(int id, LocalDate valueDate, int entryDate, DebitOrCredit debitOrCredit, double amount, String transactionCode, Description originalDescription, int fileId, Category category) {
+    public Transaction(int id, LocalDate valueDate, int entryDate, String debitOrCredit, double amount, String transactionCode, Description originalDescription, int fileId, Category category) {
         setId(id);
         setValueDate(valueDate);
         setEntryDate(entryDate);
@@ -68,11 +72,11 @@ public class Transaction {
         this.entryDate = entryDate;
     }
 
-    public DebitOrCredit getDebitOrCredit() {
+    public String getDebitOrCredit() {
         return this.debitOrCredit;
     }
 
-    public void setDebitOrCredit(DebitOrCredit debitOrCredit) {
+    public void setDebitOrCredit(String debitOrCredit) {
         this.debitOrCredit = debitOrCredit;
     }
 
@@ -164,5 +168,10 @@ public class Transaction {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    @Override
+    public String toString(){
+        return "Id" + getId();
     }
 }
