@@ -319,60 +319,46 @@
               ],
               "properties": {
                 "paymentInformationId": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "ultimateCreditor": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "endToEndReference": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "ultimateDebitor": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "counterPartyId": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "mandateReference": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "charges": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "accountOwnerInformationInOneLine": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "remittanceInformation": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "exchangeRate": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "returnReason": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "purposeCode": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "clientReference": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "instructionId": {
-                  "type": "string",
-                  "default": ""
+                  "type": "string"
                 },
                 "creditorId": {
                   "type": "string"
@@ -386,7 +372,8 @@
               "type": "string"
             },
             "debitCreditMark": {
-              "type": "string"
+              "type": "string",
+              "enum": ["D", "C"]
             },
             "valueDate": {
               "type": "string",
