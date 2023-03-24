@@ -29,14 +29,7 @@ public class JSONSchemaValidator implements Validatable{
 
             return errorsCombined;
         } catch (JsonProcessingException e) {
-            return null;
+            return "Error";
         }
-
-
-//        if (errors.size() > 0) {
-//            throw new RuntimeException("bad json" + errorsCombined);
-//        }
-//
-//        return jsonString;
     }
 }

@@ -19,7 +19,6 @@
         "mtId",
         "sessionNumber",
         "messageType",
-        "type",
         "applicationId",
         "serviceId"
       ],
