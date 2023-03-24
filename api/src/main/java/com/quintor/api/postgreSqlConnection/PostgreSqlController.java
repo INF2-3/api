@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -30,21 +29,22 @@ public class PostgreSqlController {
     }
 
     @PostMapping("/insert")
-    public String insert(@RequestParam("userId") int userId) throws IOException{
-//        MultipartFile multipartFile = convertFileToMultiPartFile(file);
-//        if (multipartFile == null || multipartFile.isEmpty()) {
-//            return "no_file";
-//        }
-        if (userId <= 0) {
+    public String i (@RequestParam("userId") int userId, @RequestParam("file") File file) throws IOException{
+            //remove when using postman to test
+        MultipartFile multipartFile = convertFileToMultiPartFile(file);
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            return "no_file";
+        }
+        if (1 <= 0) {
             return "wrong_user_id";
         }
-        String SQL = "INSERT INTO bank_statement(naam) VALUES (?)";
+        String SQL = "INSERT INTO test(naam) VALUES (?)";
         // Step 1: Establishing a Connection
         try (Connection connection = DriverManager.getConnection(url, user, password);
 
              // Step 2:Create a statement using connection object
              PreparedStatement preparedStatement = connection.prepareStatement(SQL)) {
-            preparedStatement.setString(1, "test afschrift");
+            preparedStatement.setString(1, "afschrift");
 
 
             System.out.println(preparedStatement);
@@ -66,5 +66,28 @@ public class PostgreSqlController {
         }
         InputStream stream = new FileInputStream(file);
         return new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
+    }
+
+    private boolean getResponse(HttpURLConnection httpURLConnection) throws IOException {
+        if (httpURLConnection == null) {
+            return false;
+        }
+        int responseCode = httpURLConnection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            System.out.println(response);
+            if (response.toString().equals("success")) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }
