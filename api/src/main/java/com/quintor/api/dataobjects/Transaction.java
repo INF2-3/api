@@ -3,40 +3,24 @@ package com.quintor.api.dataobjects;
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "transaction")
 public class Transaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    @Column(name = "valueDate")
     private LocalDate valueDate;
-    @Column(name = "entryDate")
     private int entryDate;
-    @Column(name = "debit/credit")
-    private String debitOrCredit;
-    @Column(name = "amount")
+    private DebitOrCredit debitOrCredit;
     private double amount;
-    @Column(name = "transactionCode")
     private String transactionCode;
-    @Column(name = "referenceOwner")
     private String referenceOwner;
-    @Column(name = "institutionReference")
     private String institutionReference;
-    @Column(name = "supplementaryDetails")
     private String supplementaryDetails;
-    @Column(name = "originalDescriptionId")
     private int originalDescriptionId;
     private Description originalDescription;
-    @Column(name = "description")
     private String description;
-    @Column(name = "fileId")
     private int fileId;
-    @Column(name = "categoryId")
     private int categoryId;
     private Category category;
 
-    public Transaction(int id, LocalDate valueDate, int entryDate, String debitOrCredit, double amount, String transactionCode, Description originalDescription, int fileId, Category category) {
+    public Transaction(int id, LocalDate valueDate, int entryDate, DebitOrCredit debitOrCredit, double amount, String transactionCode, Description originalDescription, int fileId, Category category) {
         setId(id);
         setValueDate(valueDate);
         setEntryDate(entryDate);
@@ -72,11 +56,11 @@ public class Transaction {
         this.entryDate = entryDate;
     }
 
-    public String getDebitOrCredit() {
+    public DebitOrCredit getDebitOrCredit() {
         return this.debitOrCredit;
     }
 
-    public void setDebitOrCredit(String debitOrCredit) {
+    public void setDebitOrCredit(DebitOrCredit debitOrCredit) {
         this.debitOrCredit = debitOrCredit;
     }
 
@@ -171,7 +155,7 @@ public class Transaction {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "Id" + getId();
     }
 }
