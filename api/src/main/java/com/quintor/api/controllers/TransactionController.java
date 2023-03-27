@@ -2,6 +2,7 @@ package com.quintor.api.controllers;
 
 import com.quintor.api.dataobjects.Transaction;
 import com.quintor.api.postgresql.ConnectionPostgres;
+import com.quintor.api.toXml.ToXML;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +14,7 @@ import java.util.List;
 @RequestMapping("api/transaction/")
 public class TransactionController {
 
-    @GetMapping("getAllTransactions")
+    @GetMapping("getAllTransactionsJSON")
     public List<Transaction> findAll() {
         try {
             return ConnectionPostgres.getAllTransactions();
@@ -22,6 +23,16 @@ public class TransactionController {
         }
     }
 
+    @GetMapping("getAllTransactionsXML")
+    public String findAllTransactionsXML() {
+        try {
+            List<Transaction> allTransactions = ConnectionPostgres.getAllTransactions();
+            return ToXML.transactionsToXML(allTransactions);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
 }
