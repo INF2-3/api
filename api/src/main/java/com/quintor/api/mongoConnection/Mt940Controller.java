@@ -66,20 +66,10 @@ public class Mt940Controller {
         return new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
     }
 
-    //
     @PostMapping("/MT940toJSONValidation")
-    public ResponseEntity<String> MT940toJSONValidation(@RequestParam("file") MultipartFile file) {
+    public String MT940toJSONValidation(@RequestParam("file") MultipartFile file) {
         SchemaValidator schemaValidator = new JSONSchemaValidator();
-        try {
-            String result = schemaValidator.validateFormat(file);
-            if (result != null) {
-                return ResponseEntity.ok().body(result);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: result is null.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
-        }
+        return schemaValidator.validateFormat(file);
     }
 
     @PostMapping("/MT940toXMLValidation")
