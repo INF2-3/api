@@ -31,8 +31,5 @@ public class TransactionController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
-
-
 }

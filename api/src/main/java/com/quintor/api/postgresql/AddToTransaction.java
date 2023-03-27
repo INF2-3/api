@@ -8,7 +8,7 @@ import com.quintor.api.dataobjects.Transaction;
 import java.time.LocalDate;
 
 public class AddToTransaction {
-    public static Transaction makeTransaction(int id, LocalDate valueDate, int entryDate, String debCred, double amount, String transactionCode, String referenceOwner, String institutionReference, String supplementaryDetails, int originalDescriptionId, String description, int fileId, int categoryId) {
+    public static Transaction makeTransaction(int id, LocalDate valueDate, int entryDate, String debCred, double amount, String transactionCode, String referenceOwner, String institutionReference, String supplementaryDetails, Description originalDescription, String description, int fileId, Category category) {
         DebitOrCredit debitOrCredit;
         if (debCred.equals("c") || debCred.equals("C")) {
             debitOrCredit = DebitOrCredit.CREDIT;
@@ -18,7 +18,7 @@ public class AddToTransaction {
             debitOrCredit = null;
         }
 
-        Transaction transaction = new Transaction(id, valueDate, entryDate, debitOrCredit, amount, transactionCode, new Description(originalDescriptionId), fileId, new Category(categoryId, "test"));
+        Transaction transaction = new Transaction(id, valueDate, entryDate, debitOrCredit, amount, transactionCode, originalDescription, fileId, category);
         transaction.setReferenceOwner(referenceOwner);
         transaction.setInstitutionReference(institutionReference);
         transaction.setSupplementaryDetails(supplementaryDetails);
@@ -47,5 +47,10 @@ public class AddToTransaction {
         description.setExchangeRate(exchangeRate);
         description.setCharges(charges);
         return description;
+    }
+
+    public static Category makeCategory(int categoryId, String categoryName){
+        return new Category(categoryId, categoryName);
+
     }
 }
