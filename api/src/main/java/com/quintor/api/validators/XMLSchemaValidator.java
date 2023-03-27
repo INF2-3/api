@@ -8,25 +8,28 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class XMLSchemaValidator extends SchemaValidator {
+
+    public XMLSchemaValidator() {
+        super("xml");
+    }
 
     @Override
     public String validateFormat(MultipartFile file) {
         try {
-            String input = requestInputFromParser(file);
+            StringBuffer input = requestInputFromParser(file);
             InputStream schemaStream = XMLSchemaValidator.class.getClassLoader().getResourceAsStream("schemas/schema.xml");
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(new StreamSource(schemaStream));
             Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(new File("api/src/main/resources/schemas/test.xml")));
+            validator.validate(new StreamSource(new ByteArrayInputStream(input.toString().getBytes(StandardCharsets.UTF_8))));
 
         } catch (SAXException | IOException e) {
             return e.getMessage();
         }
-        return "Success";
+        return "Validated";
     }
 }

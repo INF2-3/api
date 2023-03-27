@@ -285,28 +285,28 @@
                                         <xs:element name="numberOfDebitEntries">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
-                                                    <xs:pattern value="^([0-9]\d*)?$"/>
+                                                    <xs:pattern value="([0-9]\d*)?"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
                                         <xs:element name="numberOfCreditEntries">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
-                                                    <xs:pattern value="^([0-9]\d*)?$"/>
+                                                    <xs:pattern value="([0-9]\d*)?"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
                                         <xs:element name="debitEntriesTotalAmount">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
-                                                    <xs:pattern value="^(0|[1-9]\d*)(,\d+)?$"/>
+                                                    <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
                                         <xs:element name="creditEntriesTotalAmount">
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
-                                                    <xs:pattern value="^(0|[1-9]\d*)(,\d+)?$"/>
+                                                    <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>

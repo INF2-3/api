@@ -11,7 +11,9 @@ import com.quintor.api.validators.JSONSchemaValidator;
 import com.quintor.api.validators.SchemaValidator;
 import com.quintor.api.validators.Validatable;
 import com.quintor.api.validators.XMLSchemaValidator;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,9 +81,18 @@ public class Mt940Controller {
     }
 //
     @PostMapping("/MT940toJSONValidation")
-    public String MT940toJSONValidation(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> MT940toJSONValidation(@RequestParam("file") MultipartFile file) {
         SchemaValidator schemaValidator = new JSONSchemaValidator();
-        return schemaValidator.validateFormat(file);
+        try {
+            String result = schemaValidator.validateFormat(file);
+            if (result != null) {
+                return ResponseEntity.ok().body(result);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: result is null.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
     }
 
     @PostMapping("/MT940toXMLValidation")
@@ -90,33 +101,4 @@ public class Mt940Controller {
         return schemaValidator.validateFormat(file);
     }
 
-//    private String postRequestToParser(MultipartFile file, Validatable validator) throws IOException {
-//        String url = "http:localhost:8080/MT940toJSON";
-//        URL api = new URL(url);
-//        HttpURLConnection httpURLConnection = (HttpURLConnection) api.openConnection();
-//        httpURLConnection.setRequestMethod("POST");
-//        httpURLConnection.setRequestProperty("Accept", "application/json");
-//
-//        httpURLConnection.setDoOutput(true);
-//        OutputStream os = httpURLConnection.getOutputStream();
-//        String params = "file=" + file;
-//        os.write(params.getBytes());
-//        os.flush();
-//        os.close();
-//
-//        int responseCode = httpURLConnection.getResponseCode();
-//        if (responseCode == HttpURLConnection.HTTP_OK) {
-//            BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-//            String inputLine;
-//            StringBuffer response = new StringBuffer();
-//
-//            while ((inputLine = in.readLine()) != null) {
-//                response.append(inputLine);
-//            }
-//            in.close();
-//
-//            return validator.validateFormat(response.toString());
-//        }
-//        return String.valueOf(responseCode);
-//    }
 }

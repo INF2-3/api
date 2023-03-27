@@ -2,28 +2,49 @@ package com.quintor.api.validators;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 public abstract class SchemaValidator {
+    private String validatorType;
+
+    public SchemaValidator(String validatorType) {
+        this.validatorType = validatorType;
+    }
     public abstract String validateFormat(MultipartFile file);
 
-    public String requestInputFromParser(MultipartFile file) throws IOException {
-        String url = "http://localhost:8080/MT940toJSON";
+    public StringBuffer requestInputFromParser(MultipartFile file) throws IOException {
+        String url = "http://localhost:8080/MT940to" + validatorType.toUpperCase();
         URL api = new URL(url);
         HttpURLConnection httpURLConnection = (HttpURLConnection) api.openConnection();
         httpURLConnection.setRequestMethod("POST");
-        httpURLConnection.setRequestProperty("Accept", "application/json");
+        String boundary = UUID.randomUUID().toString();
+        httpURLConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
         httpURLConnection.setDoOutput(true);
         OutputStream os = httpURLConnection.getOutputStream();
-        String params = "file=" + file;
-        os.write(params.getBytes());
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+
+        // Add the file parameter as a binary attachment
+        writer.write("--" + boundary + "\r\n");
+        writer.write("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getOriginalFilename() + "\"\r\n");
+        writer.write("Content-Type: " + file.getContentType() + "\r\n");
+        writer.write("\r\n");
+        writer.flush();
+
+
+        InputStream is = file.getInputStream();
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        while ((bytesRead = is.read(buffer, 0, buffer.length)) != -1) {
+            os.write(buffer, 0, bytesRead);
+        }
         os.flush();
+
+        writer.write("\r\n--" + boundary + "--\r\n");
+        writer.flush();
         os.close();
 
         int responseCode = httpURLConnection.getResponseCode();
@@ -36,9 +57,8 @@ public abstract class SchemaValidator {
                 response.append(inputLine);
             }
             in.close();
-
-            return response.toString();
+            return response;
         }
-        return httpURLConnection.getResponseMessage();
+        return null;
     }
 }
