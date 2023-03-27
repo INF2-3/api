@@ -1,15 +1,7 @@
 package com.quintor.api.mongoConnection;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
 import com.quintor.api.validators.JSONSchemaValidator;
 import com.quintor.api.validators.SchemaValidator;
-import com.quintor.api.validators.Validatable;
 import com.quintor.api.validators.XMLSchemaValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,16 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
 
 @RestController
 @RequestMapping("api/mt940")
@@ -79,7 +65,8 @@ public class Mt940Controller {
         InputStream stream = new FileInputStream(file);
         return new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
     }
-//
+
+    //
     @PostMapping("/MT940toJSONValidation")
     public ResponseEntity<String> MT940toJSONValidation(@RequestParam("file") MultipartFile file) {
         SchemaValidator schemaValidator = new JSONSchemaValidator();
