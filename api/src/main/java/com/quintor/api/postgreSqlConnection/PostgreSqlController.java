@@ -1,7 +1,6 @@
 package com.quintor.api.postgreSqlConnection;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.quintor.api.mt940.Mt940Service;
+import net.minidev.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -29,74 +27,86 @@ public class PostgreSqlController {
 
     @PostMapping("/insert")
     public String i (@RequestParam("userId") int userId, @RequestParam("file") File file) throws IOException, SQLException {
-            //remove when using postman to test
+        JSONObject json;
+        //remove when using postman to test
         MultipartFile multipartFile = convertFileToMultiPartFile(file);
         if (multipartFile == null || multipartFile.isEmpty()) {
             return "no_file";
         }
-        if (1 <= 0) {
+        if (userId <= 0) {
             return "wrong_user_id";
         }
+        json = parser(multipartFile);
         String SQL = "INSERT INTO test(naam) VALUES (?)";
         // Step 1: Establishing a Connection
         try (Connection connection = DriverManager.getConnection(url, user, password)){
-
-
              // Step 2:Create a statement using connection object
-//             PreparedStatement preparedStatement = connection.prepareStatement(SQL)) {
-//            preparedStatement.setString(1, "afschrift");
-             insertInto();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+            preparedStatement.setString(1, "afschrift");
+             insertInPostgres(json);
 
-//            System.out.println(preparedStatement);
+            System.out.println(preparedStatement);
             // Step 3: Execute the query or update query
-//            preparedStatement.executeUpdate();
-//        }
-//        catch (SQLException e) {
+            preparedStatement.executeUpdate();
+        }catch (SQLException e) {
 
             // print SQL exception information
-//            return e.toString();
-            return "yes";
+            return e.toString();
         }
 
 
-//        return "help";
+        return SQL;
     }
 
+    private JSONObject parser(MultipartFile file) throws IOException {
+        String url = "http://localhost:9091" + "/api/mt940/insert";
+        URL api = new URL(url);
+        HttpURLConnection httpURLConnection = (HttpURLConnection) api.openConnection();
+        httpURLConnection.setRequestMethod("POST");
+        httpURLConnection.setRequestProperty("Accept", "application/json");
 
-    private void insertInto() throws SQLException {
+        httpURLConnection.setDoOutput(true);
+        OutputStream os = httpURLConnection.getOutputStream();
+        String params = "file=" + file;
+        os.write(params.getBytes());
+        os.flush();
+        os.close();
+
+        return getResponse(httpURLConnection);
+    }
+
+    private JSONObject getResponse(HttpURLConnection httpURLConnection) throws IOException {
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+        if (100 <= httpURLConnection.getResponseCode() && httpURLConnection.getResponseCode() <= 399) {
+            br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            String line;
+            while((line = br.readLine()) != null){
+                sb.append(line);
+            }
+            JSONObject json = new JSONObject();
+            json.writeJSONString(sb);
+            return json;
+        } else {
+            br = new BufferedReader(new InputStreamReader(httpURLConnection.getErrorStream()));
+        }
+        return null;
+    }
+
+    private void insertInPostgres(JSONObject json) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
+        //get tag for the table
+        json.get("forwardAvailableBalance");
+        json.get("closingAvailableBalance");
+        json.get("transactions");
 
-        String[] json = new String[]{"{\n" +
-                "    \"transactionType\": \"N\",\n" +
-                "    \"identificationCode\": \"TRF\",\n" +
-             5   "    \"amount\": \"1,56\",\n" +
-                "    \"entryDate\": \"0220\",\n" +
-                "    \"informationToAccountOwner\": {\n" +
-                "     \"paymentInformationId\": \"\",\n" +
-                "     \"ultimateCreditor\": \"\",\n" +
-                "     \"endToEndReference\": \"EV12341REP1231456T1234\",\n" +
-                "     \"ultimateDebitor\": \"\",\n" +
-                "     \"counterPartyId\": \"NL32INGB0000012345/INGBNL2A/ING BANK NV INZAKE WEB\",\n" +
-                "     \"mandateReference\": \"\",\n" +
-                "     \"charges\": \"\",\n" +
-                "     \"accountOwnerInformationInOneLine\": \"/EREF/EV12341REP1231456T1234//CNTP/NL32INGB0000012345/INGBNL2A/ING BANK NV INZAKE WEB///REMI/USTD//EV10001REP1000000T1000/\",\n" +
-                "     \"remittanceInformation\": \"USTD//EV10001REP1000000T1000\",\n" +
-                "     \"exchangeRate\": \"\",\n" +
-                "     \"returnReason\": \"\",\n" +
-                "     \"purposeCode\": \"\",\n" +
-                "     \"clientReference\": \"\",\n" +
-                "     \"instructionId\": \"\",\n" +
-                "     \"creditorId\": \"\"\n" +
-                "    }"};
-
-
+        //get tag for the column
         try{
             String sql = "INSERT INTO transaction VALUES (?, ?::JSON)";
             PreparedStatement ps = connection.prepareStatement(sql);
 
             for (int i=0; i<4; i++) {
                 ps.setInt (1, i+1);
-                ps.setObject (2, json[i]);
                 ps.executeUpdate();
             }
             connection.commit();
@@ -133,26 +143,4 @@ public class PostgreSqlController {
         return new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
     }
 
-    private boolean getResponse(HttpURLConnection httpURLConnection) throws IOException {
-        if (httpURLConnection == null) {
-            return false;
-        }
-        int responseCode = httpURLConnection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            System.out.println(response);
-            if (response.toString().equals("success")) {
-                return true;
-            }
-            return false;
-        }
-        return false;
-    }
 }
