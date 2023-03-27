@@ -1,6 +1,9 @@
 package com.quintor.api.postgresql;
 
+import com.quintor.api.dataobjects.Category;
+import com.quintor.api.dataobjects.Description;
 import com.quintor.api.dataobjects.Transaction;
+
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -28,6 +31,7 @@ public class ConnectionPostgres {
 
         String sql = "SELECT * FROM transaction INNER JOIN category ON transaction.category_id = category.id INNER JOIN description ON transaction.original_description_id = description.id";
         ResultSet result = ConnectionPostgres.createConnection(sql);
+
         while (result.next()) {
             int id = result.getInt("id");
             LocalDate valueDate = result.getDate("value_date").toLocalDate();
@@ -46,19 +50,39 @@ public class ConnectionPostgres {
             String categoryName = result.getString("name");
             String returnReason = result.getString("return_reason");
             String clientReference = result.getString("client_reference");
+            String endToEndReference = result.getString("end_to_end_reference");
+            String paymentInformationId = result.getString("payment_information_id");
+            String instructionId = result.getString("instruction_id");
+            String mandateReference = result.getString("mandate_reference");
+            String creditorId = result.getString("creditor_id");
+            String counterpartyId = result.getString("counterparty_id");
+            String remittanceInformation = result.getString("remittance_information");
+            String purposeCode = result.getString("purpose_code");
+            String ultimateCreditor = result.getString("ultimate_creditor");
+            String ultimateDebtor = result.getString("ultimate_debtor");
+            String exchangeRate = result.getString("exchange_rate");
+            String charges = result.getString("charges");
+
+            Description originalDescription = AddToTransaction.makeDescription(originalDescriptionId, returnReason,
+                    clientReference, endToEndReference, paymentInformationId, instructionId, mandateReference, creditorId,
+                    counterpartyId, remittanceInformation, purposeCode, ultimateCreditor, ultimateDebtor, exchangeRate,
+                    charges);
+            Category category = AddToTransaction.makeCategory(categoryId, categoryName);
 
 
             System.out.println(categoryName);
 
             Transaction transaction = AddToTransaction.makeTransaction(id, valueDate, entryDate, debCred, amount,
-                    transactionCode, referenceOwner, institutionReference, supplementaryDetails, originalDescriptionId,
-                    description, fileId, categoryId);
+                    transactionCode, referenceOwner, institutionReference, supplementaryDetails, originalDescription,
+                    description, fileId, category);
 
 
             allTransactions.add(transaction);
         }
-
+        JSONArray jsonArray = new JSONArray(allTransactions);
+        System.out.println(jsonArray);
         return allTransactions;
+
 
     }
 
