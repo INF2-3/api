@@ -3,7 +3,7 @@
   "$id": "http://main.com/schema.json",
   "title": "Main schema",
   "type": "object",
-  "description": "This schema validates the custom json file that gets parsed by the JSONParser",
+  "description": "This schema validates against the custom json MT940 file that gets parsed by the JSONParser",
   "required": [
     "header",
     "tags"
@@ -269,98 +269,84 @@
         "transactions": {
           "description": "Schema for optional 61 tags",
           "type": "array",
-          "required": [
-            "transactionType",
-            "identificationCode",
-            "amount",
-            "entryDate",
-            "name",
-            "debitCreditMark",
-            "valueDate",
-            "referenceForTheAccountOwner"
-          ],
-          "properties": {
-            "transactionType": {
-              "type": "string"
-            },
-            "identificationCode": {
-              "type": "string"
-            },
-            "amount": {
-              "type": "string",
-              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
-              "description": "This pattern checks if amount is a number greater than or equal to 0"
-            },
-            "entryDate": {
-              "type": "string",
-              "maxLength": 4,
-              "minLength": 4
-            },
-            "informationToAccountOwner": {
-              "title": "Schema for the optional 86 tag inside a transaction (61 tag)",
-              "type": "object",
-              "required": [
-                "paymentInformationId",
-                "ultimateCreditor",
-                "endToEndReference",
-                "ultimateDebitor",
-                "counterPartyId",
-                "mandateReference",
-                "charges",
-                "accountOwnerInformationInOneLine",
-                "remittanceInformation",
-                "exchangeRate",
-                "returnReason",
-                "purposeCode",
-                "clientReference",
-                "instructionId",
-                "creditorId"
-              ],
-              "properties": {
-                "paymentInformationId": {
-                  "type": "string"
-                },
-                "ultimateCreditor": {
-                  "type": "string"
-                },
-                "endToEndReference": {
-                  "type": "string"
-                },
-                "ultimateDebitor": {
-                  "type": "string"
-                },
-                "counterPartyId": {
-                  "type": "string"
-                },
-                "mandateReference": {
-                  "type": "string"
-                },
-                "charges": {
-                  "type": "string"
-                },
-                "accountOwnerInformationInOneLine": {
-                  "type": "string"
-                },
-                "remittanceInformation": {
-                  "type": "string"
-                },
-                "exchangeRate": {
-                  "type": "string"
-                },
-                "returnReason": {
-                  "type": "string"
-                },
-                "purposeCode": {
-                  "type": "string"
-                },
-                "clientReference": {
-                  "type": "string"
-                },
-                "instructionId": {
-                  "type": "string"
-                },
-                "creditorId": {
-                  "type": "string"
+          "items": {
+            "type": "object",
+            "required": [
+              "transactionType",
+              "identificationCode",
+              "amount",
+              "entryDate",
+              "name",
+              "debitCreditMark",
+              "valueDate",
+              "referenceForTheAccountOwner"
+            ],
+            "properties": {
+              "transactionType": {
+                "type": "string"
+              },
+              "identificationCode": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+                "description": "This pattern checks if amount is a number greater than or equal to 0"
+              },
+              "entryDate": {
+                "type": "string",
+                "maxLength": 4,
+                "minLength": 4
+              },
+              "informationToAccountOwner": {
+                "title": "Schema for the optional 86 tag inside a transaction (61 tag)",
+                "type": "object",
+                "properties": {
+                  "paymentInformationId": {
+                    "type": "string"
+                  },
+                  "ultimateCreditor": {
+                    "type": "string"
+                  },
+                  "endToEndReference": {
+                    "type": "string"
+                  },
+                  "ultimateDebitor": {
+                    "type": "string"
+                  },
+                  "counterPartyId": {
+                    "type": "string"
+                  },
+                  "mandateReference": {
+                    "type": "string"
+                  },
+                  "charges": {
+                    "type": "string"
+                  },
+                  "accountOwnerInformationInOneLine": {
+                    "type": "string"
+                  },
+                  "remittanceInformation": {
+                    "type": "string"
+                  },
+                  "exchangeRate": {
+                    "type": "string"
+                  },
+                  "returnReason": {
+                    "type": "string"
+                  },
+                  "purposeCode": {
+                    "type": "string"
+                  },
+                  "clientReference": {
+                    "type": "string"
+                  },
+                  "instructionId": {
+                    "type": "string"
+                  },
+                  "creditorId": {
+                    "type": "string"
+                  }
                 }
               }
             },
