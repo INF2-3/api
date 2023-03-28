@@ -2,7 +2,9 @@ package com.quintor.api.controllers;
 
 import com.quintor.api.dataobjects.Transaction;
 import com.quintor.api.postgresql.ConnectionPostgres;
+import com.quintor.api.toJson.ToJSON;
 import com.quintor.api.toXml.ToXML;
+import org.json.JSONArray;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,9 +17,9 @@ import java.util.List;
 public class TransactionController {
 
     @GetMapping("getAllTransactionsJSON")
-    public List<Transaction> findAll() {
+    public String findAll() {
         try {
-            return ConnectionPostgres.getAllTransactions();
+            return ToJSON.transactionsToJson(ConnectionPostgres.getAllTransactions()).toString();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

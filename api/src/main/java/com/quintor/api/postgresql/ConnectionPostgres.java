@@ -3,6 +3,7 @@ package com.quintor.api.postgresql;
 import com.quintor.api.dataobjects.Category;
 import com.quintor.api.dataobjects.Description;
 import com.quintor.api.dataobjects.Transaction;
+import org.json.JSONArray;
 
 
 import java.sql.*;
@@ -29,14 +30,14 @@ public class ConnectionPostgres {
     public static List<Transaction> getAllTransactions() throws SQLException {
         List<Transaction> allTransactions = new ArrayList<>();
 
-        String sql = "SELECT * FROM transaction INNER JOIN category ON transaction.category_id = category.id INNER JOIN description ON transaction.original_description_id = description.id";
+        String sql = "SELECT * FROM transactions";
         ResultSet result = ConnectionPostgres.createConnection(sql);
 
         while (result.next()) {
             int id = result.getInt("id");
             LocalDate valueDate = result.getDate("value_date").toLocalDate();
             int entryDate = result.getInt("entry_date");
-            String debCred = result.getString("debit/credit");
+            String debCred = result.getString("debit_credit");
             double amount = result.getDouble("amount");
             String transactionCode = result.getString("transaction_code");
             String referenceOwner = result.getString("reference_owner");

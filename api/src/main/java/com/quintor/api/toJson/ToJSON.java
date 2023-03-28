@@ -7,6 +7,8 @@ import java.util.List;
 
 public class ToJSON {
     public static JSONArray transactionsToJson(List<Transaction> allTransactions) {
-        return new JSONArray(allTransactions);
+        JSONArray jsonArray = new JSONArray(allTransactions);
+        System.out.println(allTransactions);
+        return jsonArray;
     }
 }
