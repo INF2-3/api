@@ -19,7 +19,7 @@ public abstract class SchemaValidator {
     public abstract String compareToSchema(StringBuffer input) throws SAXException, IOException;
 
     /**
-     * First stores the output from the parser in a StringBuffer and calls the comapareToSchema method to validate it
+     * First stores the output from the parser in a StringBuffer and calls the compareToSchema method to validate it
      *
      * @param file MT940 file
      * @return returns "Validated" or an error message
@@ -39,7 +39,6 @@ public abstract class SchemaValidator {
      *
      * @param file MT940 file
      * @return StringBuffer containing xml or json
-     * @throws IOException
      */
     public StringBuffer requestInputFromParser(MultipartFile file) throws IOException {
         String url = System.getenv("URL") + "/MT940to" + validatorType.toUpperCase();
@@ -62,6 +61,7 @@ public abstract class SchemaValidator {
         bufferedWriter.write("\r\n");
         bufferedWriter.flush();
 
+        // Transfer input stream to upstream
         file.getInputStream().transferTo(outputStream);
         outputStream.flush();
 
@@ -69,6 +69,7 @@ public abstract class SchemaValidator {
         bufferedWriter.flush();
         outputStream.close();
 
+        // Get the request response, if response is OK, write result to StringBuffer
         int responseCode = httpURLConnection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
