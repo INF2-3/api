@@ -135,31 +135,11 @@ public class PostgreSqlController {
         }
     }
 
-
-//    public String getResponse(HttpURLConnection connection) throws IOException {
-//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//        String inputLine;
-//        StringBuffer response = new StringBuffer();
-//
-//        while ((inputLine = in.readLine()) != null) {
-//            response.append(inputLine);
-//        }
-//        in.close();
-//
-//        return response.toString();
-//    }
     private void insertInPostgres(JSONObject json) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         //get tag for the table
-
-        //date, currency, amount, dCMark
-        //multiple forwardAvailable balances!
-        //json.get("forwardAvailableBalance");
-
-        // name, date, description, currency, amount, dCMark
-        //json.get("closingAvailableBalance");
-
         JSONObject tags = (JSONObject) json.get("tags");
+
         //file_description
         String sqlFileDescription = "CALL insert_file_description(?::int, ?::int, ?::money, ?::money);";
         JSONObject fileDescription = (JSONObject) tags.get("generalInformationToAccountOwner");
@@ -179,6 +159,21 @@ public class PostgreSqlController {
         JSONObject accountIdentification = (JSONObject) tags.get("accountIdentification");
         JSONObject transactionReferenceNumber = (JSONObject) tags.get("transactionReferenceNumber");
         JSONObject statementNumber = (JSONObject) tags.get("statementNumber");
+
+        //get FILE_DESCRIPTION_ID
+        String sqlFileDescriptionId = "SELECT id FROM file_description ORDER BY id DESC LIMIT 1";
+        String fileDescriptionId;
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlFileDescriptionId);
+            ResultSet rs = ps.executeQuery();
+            while ( rs.next() ) {
+                fileDescriptionId = rs.getString("id");
+                System.out.println(fileDescriptionId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         try{
             PreparedStatement ps = connection.prepareStatement(sqlFile);
             ps.setString(1, (String) transactionReferenceNumber.get("referenceNumber"));
@@ -192,6 +187,21 @@ public class PostgreSqlController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        //get FILE_ID
+        String sqlFileId = "SELECT id FROM file ORDER BY id DESC LIMIT 1";
+        String fileId;
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlFileId);
+            ResultSet rs = ps.executeQuery();
+            while ( rs.next() ) {
+                fileId = rs.getString("id");
+                System.out.println(fileId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
 
 
         //balance
