@@ -162,12 +162,63 @@ public class PostgreSqlController {
         JSONObject tags = (JSONObject) json.get("tags");
 
 
+        //balance
+        String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::money, ?::varchar,  ?::int);";
+
+
+        JSONObject closingAvailableBalance = (JSONObject) tags.get("closingAvailableBalance");
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlBalance);
+            ps.setString(1, (String) closingAvailableBalance.get("dCMark"));
+            ps.setString(2, (String) closingAvailableBalance.get("date"));
+            ps.setString(3, (String) closingAvailableBalance.get("currency"));
+            ps.setString(4, (String) closingAvailableBalance.get("amount"));
+            ps.setString(5, "closingAvailableBalance"); //type
+            ps.setInt(6, 2); //File_id
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        JSONObject openingBalance = (JSONObject) tags.get("openingBalance");
+        try {
+            PreparedStatement ps = connection.prepareStatement(sqlBalance);
+            ps.setString(1, (String) openingBalance.get("dCMark"));
+            ps.setString(2, (String) openingBalance.get("date"));
+            ps.setString(3, (String) openingBalance.get("currency"));
+            ps.setString(4, (String) openingBalance.get("amount"));
+            ps.setString(5, "openingBalance"); //type
+            ps.setInt(6, 2); //File_id
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        JSONArray forwardAvailableBalances = (JSONArray) tags.get("forwardAvailableBalance");
+
+
+        for(int n = 0; n <forwardAvailableBalances.size(); n++){
+            PreparedStatement ps = connection.prepareStatement(sqlBalance);
+            JSONObject forwardAvailableBalance = (JSONObject) forwardAvailableBalances.get(n);
+            try{
+                ps.setString(1, (String) forwardAvailableBalance.get("dCMark"));
+                ps.setString(2, (String) forwardAvailableBalance.get("date"));
+                ps.setString(3, (String) forwardAvailableBalance.get("currency"));
+                ps.setString(4, (String) forwardAvailableBalance.get("amount"));
+                ps.setString(5, "forwardAvailableBalance"); //type
+                ps.setInt(6, 2); //File_id
+                ps.executeUpdate();
+            }catch (SQLException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        //Description
+        
+
 
         //transactions
         JSONArray transactions = (JSONArray) tags.get("transactions");
-        JSONArray array = new JSONArray();
-        for(int n = 0; n < transactions.size(); n++)
-        {
+        for(int n = 0; n < transactions.size(); n++) {
             JSONObject transaction = (JSONObject) transactions.get(n);
             try{
                 String sqlTransaction = "CALL Insert_Transaction(?::date, ?::int, ?::char, ?::money, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::int, ?::varchar, ?::int, ?::int)";
@@ -187,7 +238,6 @@ public class PostgreSqlController {
                 ps.setInt(12, 1); //catagoryID
                 ps.executeUpdate();
 //                connection.commit();
-                System.out.println(sqlTransaction);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
