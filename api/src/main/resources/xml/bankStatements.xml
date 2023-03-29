@@ -1,0 +1,287 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="MT940" type="MT940Type"/>
+    <xs:complexType name="headerType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="applicationId"/>
+            <xs:element type="xs:string" name="serviceId"/>
+            <xs:element type="xs:string" name="logicalTerminal"/>
+            <xs:element type="xs:string" name="sessionNumber"/>
+            <xs:element type="xs:string" name="sequenceNumber"/>
+            <xs:element type="xs:string" name="receiverAddress"/>
+            <xs:element type="xs:string" name="messageType"/>
+            <xs:element type="xs:string" name="mtId"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="transactionReferenceNumberType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element type="xs:string" name="referenceNumber"/>
+            <xs:element type="xs:string" name="description"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="accountIdentificationType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element type="xs:string" name="accountNumber"/>
+            <xs:element type="xs:string" name="description"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="statementNumberType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element type="xs:string" name="statementNumber"/>
+            <xs:element type="xs:string" name="description"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="openingBalanceType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element type="xs:string" name="dCMark"/>
+            <xs:element type="xs:string" name="date"/>
+            <xs:element type="xs:string" name="currency"/>
+            <xs:element type="xs:string" name="amount"/>
+            <xs:element type="xs:string" name="description"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="closingBalanceType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element type="xs:string" name="dCMark"/>
+            <xs:element type="xs:string" name="date"/>
+            <xs:element type="xs:string" name="currency"/>
+            <xs:element type="xs:string" name="amount"/>
+            <xs:element type="xs:string" name="description"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="closingAvailableBalanceType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element type="xs:string" name="dCMark"/>
+            <xs:element type="xs:string" name="date"/>
+            <xs:element type="xs:string" name="currency"/>
+            <xs:element type="xs:string" name="amount"/>
+            <xs:element type="xs:string" name="description"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="forwardAvailableBalanceType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="dCMark"/>
+            <xs:element name="date">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="140221"/>
+                        <xs:enumeration value="140224"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element type="xs:string" name="currency"/>
+            <xs:element type="xs:string" name="amount"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="forwardAvailableBalancesType">
+        <xs:sequence>
+            <xs:element type="forwardAvailableBalanceType" name="forwardAvailableBalance" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="informationToAccountOwnerType" mixed="true">
+        <xs:sequence>
+            <xs:element name="accountOwnerInformationInOneLine" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="/EREF/EV12341REP1231456T1234//CNTP/NL32INGB0000012345/INGBNL2A/ING BANK NV INZAKE WEB///REMI/USTD//EV10001REP1000000T1000/"/>
+                        <xs:enumeration value="/PREF/M000000003333333//REMI/USTD//TOTAAL 1 VZ/"/>
+                        <xs:enumeration value="/RTRN/MS03//EREF/20120123456789//CNTP/NL32INGB0000012345/INGBNL2A/J.Janssen///REMI/USTD//Factuurnr 123456 Klantnr 00123/"/>
+                        <xs:enumeration value="/EREF/EV123REP123412T1234//MARF/MND-EV01//CSID/NL32ZZZ999999991234//CNTP/NL32INGB0000012345/INGBNL2A/ING Bank N.V. inzake WeB///REMI/USTD//EV123REP123412T1234/"/>
+                        <xs:enumeration value="/PREF/M000000001111111//CSID/NL32ZZZ999999991234//REMI/USTD//TOTAAL       1 POSTEN/"/>
+                        <xs:enumeration value="/RTRN/MS03//EREF/20120501P0123478//MARF/MND-120123//CSID/NL32ZZZ999999991234//CNTP/NL32INGB0000012345/INGBNL2A/J.Janssen///REMI/USTD//CONTRIBUTIE FEB 2014/"/>
+                        <xs:enumeration value="/EREF/15814016000676480//CNTP/NL32INGB0000012345/INGBNL2A/J.Janssen///REMI/STRD/CUR/9001123412341234/"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="returnReason" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="MS03"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element type="xs:string" name="clientReference" minOccurs="0"/>
+            <xs:element name="endToEndReference" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="EV12341REP1231456T1234"/>
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="20120123456789"/>
+                        <xs:enumeration value="EV123REP123412T1234"/>
+                        <xs:enumeration value="20120501P0123478"/>
+                        <xs:enumeration value="15814016000676480"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="paymentInformationId" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="M000000003333333"/>
+                        <xs:enumeration value="M000000001111111"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element type="xs:string" name="instructionId" minOccurs="0"/>
+            <xs:element name="mandateReference" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="MND-EV01"/>
+                        <xs:enumeration value="MND-120123"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="creditorId" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="NL32ZZZ999999991234"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="counterPartyId" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="NL32INGB0000012345/INGBNL2A/ING BANK NV INZAKE WEB"/>
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="NL32INGB0000012345/INGBNL2A/J.Janssen"/>
+                        <xs:enumeration value="NL32INGB0000012345/INGBNL2A/ING Bank N.V. inzake WeB"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="remittanceInformation" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="USTD//EV10001REP1000000T1000"/>
+                        <xs:enumeration value="USTD//TOTAAL 1 VZ"/>
+                        <xs:enumeration value="USTD//Factuurnr 123456 Klantnr 00123"/>
+                        <xs:enumeration value="USTD//EV123REP123412T1234"/>
+                        <xs:enumeration value="USTD//TOTAAL       1 POSTEN"/>
+                        <xs:enumeration value="USTD//CONTRIBUTIE FEB 2014"/>
+                        <xs:enumeration value="STRD/CUR/9001123412341234"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element type="xs:string" name="purposeCode" minOccurs="0"/>
+            <xs:element type="xs:string" name="ultimateCreditor" minOccurs="0"/>
+            <xs:element type="xs:string" name="ultimateDebitor" minOccurs="0"/>
+            <xs:element type="xs:string" name="exchangeRate" minOccurs="0"/>
+            <xs:element type="xs:string" name="charges" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="transactionType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element type="xs:string" name="transactionType"/>
+            <xs:element name="identificationCode">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="TRF"/>
+                        <xs:enumeration value="RTI"/>
+                        <xs:enumeration value="DDT"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="amount">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="1,56"/>
+                        <xs:enumeration value="1,57"/>
+                        <xs:enumeration value="1,14"/>
+                        <xs:enumeration value="1,45"/>
+                        <xs:enumeration value="12,75"/>
+                        <xs:enumeration value="32,00"/>
+                        <xs:enumeration value="119,00"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element type="xs:string" name="entryDate"/>
+            <xs:element name="supplementaryDetails">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="/TRCD/00100/"/>
+                        <xs:enumeration value="/TRCD/00200/"/>
+                        <xs:enumeration value="/TRCD/00190/"/>
+                        <xs:enumeration value="/TRCD/01016/"/>
+                        <xs:enumeration value="/TRCD/01000/"/>
+                        <xs:enumeration value="/TRCD/01315/"/>
+                        <xs:enumeration value="/TRCD/00108/"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="debitCreditMark">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="C"/>
+                        <xs:enumeration value="D"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element type="xs:string" name="valueDate"/>
+            <xs:element name="referenceForTheAccountOwner">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="EREF"/>
+                        <xs:enumeration value="PREF"/>
+                        <xs:enumeration value="9001123412341234"/>
+                        <xs:enumeration value="1070123412341234"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="referenceOfTheAccountServicingInstitution">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="00000000001005"/>
+                        <xs:enumeration value="00000000001006"/>
+                        <xs:enumeration value="00000000001007"/>
+                        <xs:enumeration value="00000000001009"/>
+                        <xs:enumeration value="00000000001008"/>
+                        <xs:enumeration value="00000000001010"/>
+                        <xs:enumeration value="00000000001011"/>
+                        <xs:enumeration value="00000000001012"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element type="informationToAccountOwnerType" name="informationToAccountOwner"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="transactionsType">
+        <xs:sequence>
+            <xs:element type="transactionType" name="transaction" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="generalInformationToAccountOwnerType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="numberOfDebitEntries"/>
+            <xs:element type="xs:string" name="numberOfCreditEntries"/>
+            <xs:element type="xs:string" name="debitEntriesTotalAmount"/>
+            <xs:element type="xs:string" name="creditEntriesTotalAmount"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="tagsType">
+        <xs:sequence>
+            <xs:element type="transactionReferenceNumberType" name="transactionReferenceNumber"/>
+            <xs:element type="accountIdentificationType" name="accountIdentification"/>
+            <xs:element type="statementNumberType" name="statementNumber"/>
+            <xs:element type="openingBalanceType" name="openingBalance"/>
+            <xs:element type="closingBalanceType" name="closingBalance"/>
+            <xs:element type="closingAvailableBalanceType" name="closingAvailableBalance"/>
+            <xs:element type="forwardAvailableBalancesType" name="forwardAvailableBalances"/>
+            <xs:element type="transactionsType" name="transactions"/>
+            <xs:element type="generalInformationToAccountOwnerType" name="generalInformationToAccountOwner"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="MT940Type">
+        <xs:sequence>
+            <xs:element type="headerType" name="header"/>
+            <xs:element type="tagsType" name="tags"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
