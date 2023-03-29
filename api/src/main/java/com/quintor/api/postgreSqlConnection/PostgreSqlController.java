@@ -160,12 +160,22 @@ public class PostgreSqlController {
         //json.get("closingAvailableBalance");
 
         JSONObject tags = (JSONObject) json.get("tags");
-
+        //file_description
+        String sqlFileDescription = "CALL insert_file_description(?::int, ?::int, ?::money, ?::money);";
+        JSONObject fileDescription = (JSONObject) tags.get("generalInformationToAccountOwner");
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlFileDescription);
+            ps.setString(1, (String) fileDescription.get("numberOfDebitEntries"));
+            ps.setString(2, (String) fileDescription.get("numberOfCreditEntries"));
+            ps.setString(3, (String) fileDescription.get("debitEntriesTotalAmount"));
+            ps.setString(4, (String) fileDescription.get("creditEntriesTotalAmount"));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         //balance
         String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::money, ?::varchar,  ?::int);";
-
-
         JSONObject closingAvailableBalance = (JSONObject) tags.get("closingAvailableBalance");
         try{
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
