@@ -212,14 +212,12 @@ public class PostgreSqlController {
             }
         }
 
-        //Description
-        
-
 
         //transactions
         JSONArray transactions = (JSONArray) tags.get("transactions");
         for(int n = 0; n < transactions.size(); n++) {
             JSONObject transaction = (JSONObject) transactions.get(n);
+            JSONObject description = (JSONObject) transaction.get("informationToAccountOwner");
             try{
                 String sqlTransaction = "CALL Insert_Transaction(?::date, ?::int, ?::char, ?::money, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::int, ?::varchar, ?::int, ?::int)";
                 PreparedStatement ps = connection.prepareStatement(sqlTransaction);
@@ -237,8 +235,27 @@ public class PostgreSqlController {
                 ps.setInt(12, 11); //catagoryID
                 ps.setInt(12, 1); //catagoryID
                 ps.executeUpdate();
-//                connection.commit();
-        } catch (SQLException e) {
+
+                //Description transaction ID as foreinkey might need to be added
+                String sqlDescription = "CALL Insert_description( ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar);";
+                PreparedStatement psd = connection.prepareStatement(sqlDescription);
+                psd.setString(1, (String) description.get("returnReason")); //return_reason
+                psd.setString(2, (String) description.get("clientReference")); //client_reference
+                psd.setString(3, (String) description.get("endToEndReference")); //end_to_end_reference
+                psd.setString(4, (String) description.get("paymentInformationId")); //payment_information_id
+                psd.setString(5, (String) description.get("instructionId")); //instruction_id
+                psd.setString(6, (String) description.get("mandateReference")); //mandate_reference
+                psd.setString(7, (String) description.get("creditorId")); //creditor_id
+                psd.setString(8, (String) description.get("counterPartyId")); //counterparty_id
+                psd.setString(9, (String) description.get("remittanceInformation")); //remittance_information
+                psd.setString(10, (String) description.get("purposeCode")); //purpose_code
+                psd.setString(11, (String) description.get("ultimateCreditor")); //ultimate_creditor
+                psd.setString(12, (String) description.get("ultimateDebitor")); //ultimate_debtor
+                psd.setString(13, (String) description.get("exchangeRate")); //exchange_rate
+                psd.setString(14, (String) description.get("charges")); //charges
+                psd.executeUpdate();
+
+            } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         }
