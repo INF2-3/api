@@ -1,7 +1,10 @@
 package com.quintor.api.postgreSqlConnection;
 
 import com.quintor.api.mt940.Json;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -31,7 +34,7 @@ public class PostgreSqlController {
     private final String password = "changeme";
 
     @PostMapping("/insert")
-    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, SQLException {
+    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, SQLException, ParseException {
 
         System.out.println("in endpoint");
         //remove when using postman to test
@@ -42,12 +45,17 @@ public class PostgreSqlController {
         if (userId <= 0) {
             return "wrong_user_id";
         }
-        JSONObject json = parser(file);
+        String jsonString = parser(file);
+
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(jsonString);
+        //System.out.println(json);
         // Step 1: Establishing a Connection
         try (Connection connection = DriverManager.getConnection(url, user, password)){
              // Step 2:Create a statement using connection object
             //PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-             //insertInPostgres(json);
+            assert json != null;
+            insertInPostgres(json);
 
             //System.out.println(preparedStatement);
             // Step 3: Execute the query or update query
@@ -62,7 +70,7 @@ public class PostgreSqlController {
         return "done";
     }
 
-    private JSONObject parser(File file) throws IOException {
+    private String parser(File file) throws IOException {
         String url = "http://localhost:9091" + "/MT940toJSON";
         URL api = new URL(url);
         HttpURLConnection httpURLConnection = (HttpURLConnection) api.openConnection();
@@ -90,10 +98,10 @@ public class PostgreSqlController {
                 sb.append(inputLine);
             }
             String response2 = sb.toString();
-            System.out.println(response2);
+            //System.out.println(response2);
             test = getResponse(httpURLConnection);
             in.close();
-            return test;
+            return response2;
             // print result
         } else {
             System.out.println("POST request not worked");
@@ -150,9 +158,40 @@ public class PostgreSqlController {
 
         // name, date, description, currency, amount, dCMark
         //json.get("closingAvailableBalance");
-        // transactionType, identificationCode, amount, entryDate, informationToAccountOwner{ endToEndReference, ...... }, supplementaryDetails, name, debitCreditMark, valueDate, referenceForTheAccountOwner, referenceOfTheAccountServicingInstitution
-        JSONObject transactions = (JSONObject) json.get("transactions");
 
+        JSONObject tags = (JSONObject) json.get("tags");
+
+
+
+        //transactions
+        JSONArray transactions = (JSONArray) tags.get("transactions");
+        JSONArray array = new JSONArray();
+        for(int n = 0; n < transactions.size(); n++)
+        {
+            JSONObject transaction = (JSONObject) transactions.get(n);
+            try{
+                String sqlTransaction = "CALL Insert_Transaction(?::date, ?::int, ?::char, ?::money, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::int, ?::varchar, ?::int, ?::int)";
+                PreparedStatement ps = connection.prepareStatement(sqlTransaction);
+                ps.setString(1, (String) transaction.get("valueDate"));
+                ps.setString(2, (String) transaction.get("entryDate"));
+                ps.setString(3, (String) transaction.get("debitCreditMark"));
+                ps.setString(4, (String) transaction.get("amount"));
+                ps.setString(5, (String) transaction.get("identificationCode"));
+                ps.setString(6, (String) transaction.get("referenceForTheAccountOwner"));
+                ps.setString(7, (String) transaction.get("referenceOfTheAccountServicingInstitution"));
+                ps.setString(8, (String) transaction.get("supplementaryDetails"));
+                ps.setInt(9,2);                       //original_description_ID
+                ps.setString(10, "This is a description");                  //description
+                ps.setInt(11, 11);                     //fileID
+                ps.setInt(12, 11); //catagoryID
+                ps.setInt(12, 1); //catagoryID
+                ps.executeUpdate();
+//                connection.commit();
+                System.out.println(sqlTransaction);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        }
         //Loop with forEach transaction in transactions to get all te rows
         //transactions.get("amount");
 
@@ -165,47 +204,8 @@ public class PostgreSqlController {
         String sqlTransaction = "CALL Insert_Transaction(?::date, ?::int, ?::char, ?::money, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::int, ?::varchar, ?::int, ?::int)";
         System.out.println("in insertPostgress");
         //get tag for the column
-        try{
-            //String sql = "INSERT INTO transaction VALUES (?, ?::JSON)";
-            PreparedStatement ps = connection.prepareStatement(sqlTransaction);
-            ps.setDate(1, (Date) transactions.get("valueDate"));
-            ps.setInt(2, (Integer) transactions.get("entryDate"));
-            ps.setString(3, (String) transactions.get("debitCreditMark"));
-            ps.setDouble(4, (Double) transactions.get("amount"));
-            ps.setString(5, (String) transactions.get("identificationCode"));
-            ps.setString(6, (String) transactions.get("referenceForTheAccountOwner"));
-            ps.setString(7, (String) transactions.get("referenceOfTheAccountServicingInstitution"));
-            ps.setString(8, (String) transactions.get("supplementaryDetails"));
-            ps.setInt(9,2);                       //original_description_ID
-            ps.setString(10, "This is a description");                  //description
-            ps.setInt(11, 1);                     //fileID
-            ps.setInt(12, 1); //catagoryID
-            ps.executeUpdate();
-            connection.commit();
-            System.out.println(sqlTransaction);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
 
     }
-//    private <PGobject> getFromDbToJson(){
-//        try{
-//            String sql = "";
-//            Connection connection = DriverManager.getConnection(url, user, password);
-//            Statement stmnt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-//            ResultSet rs = stmnt.executeQuery(sql);
-//
-//            JSONPObject json;
-//            JSONPObject json2;
-//
-//            while(rs.next()){
-//
-//            }
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
 
     private MultipartFile convertFileToMultiPartFile(File file) throws IOException {
