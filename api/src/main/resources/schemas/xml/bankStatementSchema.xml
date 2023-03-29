@@ -36,6 +36,7 @@
                                             <xs:simpleType>
                                                 <xs:restriction base="xs:string">
                                                     <xs:length value="21"/>
+                                                    <xs:pattern value="NL[0-9]{2}[A-z0-9]{4}[0-9]{10}[A-Z]{3}"/>
                                                 </xs:restriction>
                                             </xs:simpleType>
                                         </xs:element>
@@ -47,7 +48,13 @@
                                 <xs:complexType>
                                     <xs:all>
                                         <xs:element type="xs:string" name="name"/>
-                                        <xs:element type="xs:string" name="statementNumber"/>
+                                        <xs:element name="statementNumber">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:maxLength value="5"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
                                         <xs:element type="xs:string" name="description"/>
                                     </xs:all>
                                 </xs:complexType>
@@ -211,7 +218,13 @@
                                             <xs:complexType>
                                                 <xs:all>
                                                     <xs:element type="xs:string" name="name"/>
-                                                    <xs:element type="xs:string" name="transactionType"/>
+                                                    <xs:element name="transactionType">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:maxLength value="4"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
                                                     <xs:element type="xs:string" name="identificationCode"/>
                                                     <xs:element name="amount">
                                                         <xs:simpleType>
@@ -256,7 +269,13 @@
                                                         <xs:complexType mixed="true">
                                                             <xs:all>
                                                                 <xs:element type="xs:string" name="accountOwnerInformationInOneLine" minOccurs="0"/>
-                                                                <xs:element type="xs:string" name="returnReason" minOccurs="0"/>
+                                                                <xs:element name="returnReason" minOccurs="0">
+                                                                    <xs:simpleType>
+                                                                        <xs:restriction base="xs:string">
+                                                                            <xs:maxLength value="4"/>
+                                                                        </xs:restriction>
+                                                                    </xs:simpleType>
+                                                                </xs:element>
                                                                 <xs:element type="xs:string" name="clientReference" minOccurs="0"/>
                                                                 <xs:element type="xs:string" name="endToEndReference" minOccurs="0"/>
                                                                 <xs:element type="xs:string" name="paymentInformationId" minOccurs="0"/>
