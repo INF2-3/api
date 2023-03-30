@@ -162,12 +162,12 @@ public class PostgreSqlController {
 
         //get FILE_DESCRIPTION_ID
         String sqlFileDescriptionId = "SELECT id FROM file_description ORDER BY id DESC LIMIT 1";
-        String fileDescriptionId;
+        int fileDescriptionId = 0;
         try{
             PreparedStatement ps = connection.prepareStatement(sqlFileDescriptionId);
             ResultSet rs = ps.executeQuery();
             while ( rs.next() ) {
-                fileDescriptionId = rs.getString("id");
+                fileDescriptionId = Integer.parseInt(rs.getString("id"));
                 System.out.println(fileDescriptionId);
             }
         } catch (SQLException e) {
@@ -179,7 +179,7 @@ public class PostgreSqlController {
             ps.setString(1, (String) transactionReferenceNumber.get("referenceNumber"));
             ps.setString(2, (String) accountIdentification.get("accountNumber"));
             ps.setString(3, (String) statementNumber.get("statementNumber"));
-            ps.setInt(4, 2);
+            ps.setInt(4, fileDescriptionId);
             ps.setInt(5, 1);
             ps.setString(6, "2300-10-23");
             ps.setString(7, "What?");
@@ -190,12 +190,12 @@ public class PostgreSqlController {
 
         //get FILE_ID
         String sqlFileId = "SELECT id FROM file ORDER BY id DESC LIMIT 1";
-        String fileId;
+        int fileId = 0;
         try{
             PreparedStatement ps = connection.prepareStatement(sqlFileId);
             ResultSet rs = ps.executeQuery();
             while ( rs.next() ) {
-                fileId = rs.getString("id");
+                fileId = Integer.parseInt(rs.getString("id"));
                 System.out.println(fileId);
             }
         } catch (SQLException e) {
@@ -272,7 +272,7 @@ public class PostgreSqlController {
                 ps.setInt(9,2);                       //original_description_ID
                 ps.setString(10, "This is a description");                  //description
                 ps.setInt(11, 11);                     //fileID
-                ps.setInt(12, 11); //catagoryID
+                ps.setInt(12, fileId); //catagoryID
                 ps.setInt(12, 1); //catagoryID
                 ps.executeUpdate();
 
