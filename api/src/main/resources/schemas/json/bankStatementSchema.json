@@ -351,30 +351,33 @@
                     "type": "string"
                   }
                 }
+              },
+              "supplementaryDetails": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "debitCreditMark": {
+                "type": "string",
+                "enum": [
+                  "D",
+                  "C"
+                ]
+              },
+              "valueDate": {
+                "type": "string",
+                "maxLength": 6,
+                "minLength": 6
+              },
+              "referenceForTheAccountOwner": {
+                "type": "string"
+              },
+              "referenceOfTheAccountServicingInstitution": {
+                "type": "string",
+                "maxLength": 16,
+                "minLength": 14
               }
-            },
-            "supplementaryDetails": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "debitCreditMark": {
-              "type": "string",
-              "enum": ["D", "C"]
-            },
-            "valueDate": {
-              "type": "string",
-              "maxLength": 6,
-              "minLength": 6
-            },
-            "referenceForTheAccountOwner": {
-              "type": "string"
-            },
-            "referenceOfTheAccountServicingInstitution": {
-              "type": "string",
-              "maxLength": 16,
-              "minLength": 14
             }
           }
         },

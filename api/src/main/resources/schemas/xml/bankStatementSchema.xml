@@ -214,7 +214,7 @@
                             <xs:element name="transactions" minOccurs="0">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="transaction" maxOccurs="unbounded">
+                                        <xs:element name="transaction" maxOccurs="unbounded" minOccurs="0">
                                             <xs:complexType>
                                                 <xs:all>
                                                     <xs:element type="xs:string" name="name"/>
