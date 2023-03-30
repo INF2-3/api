@@ -30,11 +30,11 @@ public class ConnectionPostgres {
     public static List<Transaction> getAllTransactions() throws SQLException {
         List<Transaction> allTransactions = new ArrayList<>();
 
-        String sql = "SELECT * FROM transactions";
+        String sql = "SELECT * FROM transactionsview";
         ResultSet result = ConnectionPostgres.createConnection(sql);
 
         while (result.next()) {
-            int id = result.getInt("id");
+            int id = result.getInt("c_id");
             LocalDate valueDate = result.getDate("value_date").toLocalDate();
             int entryDate = result.getInt("entry_date");
             String debCred = result.getString("debit_credit");
