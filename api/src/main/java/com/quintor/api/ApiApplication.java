@@ -14,16 +14,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories(basePackages = "com.quintor.api.mongoConnection")
 @EntityScan("com.quintor.api.databojects")
 public class ApiApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(ApiApplication.class, args);
     }
-//    @Bean
-//    public CommandLineRunner demo(TransactionRepository transactionRepository) {
-//        return (args -> {
-//            for(Transaction transaction: transactionRepository.findAll()) {
-//                System.out.println(transaction.toString());
-//            }
-//        });
-//    }
 }

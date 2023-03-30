@@ -16,6 +16,11 @@ import java.util.List;
 @RequestMapping("api/transaction/")
 public class TransactionController {
 
+    /**
+     * This method can be called when you want all transaction from the postgresql database in JSON format
+     *
+     * @return a list with all the transactions
+     */
     @GetMapping("getAllTransactionsJSON")
     public String findAll() {
         try {
@@ -25,6 +30,11 @@ public class TransactionController {
         }
     }
 
+    /**
+     * This method can be called when you want all transactions from the postgresql database in XML format
+     *
+     * @return a list with all the transactions
+     */
     @GetMapping("getAllTransactionsXML")
     public String findAllTransactionsXML() {
         try {

@@ -15,7 +15,12 @@ public class ConnectionPostgres {
     private static final String user = "root";
     private static final String password = "changeme";
 
-
+    /**
+     * Creates the connection with a sql query.
+     *
+     * @param sql the query that has to be executed.
+     * @return a ResultSet with the results of the query
+     */
     private static ResultSet createConnection(String sql) {
         try (Connection connection = DriverManager.getConnection(url, user, password);
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -26,6 +31,14 @@ public class ConnectionPostgres {
         return null;
     }
 
+    /**
+     * Get all the transaction from the database with a view.
+     * Loops over the results and makes the transaction, description and category.
+     * Then adds the transaction to the List with all the transactions
+     *
+     * @return A list with all the transactions
+     * @throws SQLException can throw SQLException.
+     */
     public static List<Transaction> getAllTransactions() throws SQLException {
         List<Transaction> allTransactions = new ArrayList<>();
 
@@ -69,9 +82,6 @@ public class ConnectionPostgres {
                     charges);
             Category category = AddToTransaction.makeCategory(categoryId, categoryName);
 
-
-            System.out.println(categoryName);
-
             Transaction transaction = AddToTransaction.makeTransaction(id, valueDate, entryDate, debCred, amount,
                     transactionCode, referenceOwner, institutionReference, supplementaryDetails, originalDescription,
                     description, fileId, category);
@@ -80,10 +90,6 @@ public class ConnectionPostgres {
             allTransactions.add(transaction);
         }
         JSONArray jsonArray = new JSONArray(allTransactions);
-        System.out.println(jsonArray);
         return allTransactions;
-
-
     }
-
 }
