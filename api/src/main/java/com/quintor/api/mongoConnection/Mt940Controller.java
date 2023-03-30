@@ -1,5 +1,8 @@
 package com.quintor.api.mongoConnection;
 
+import com.quintor.api.validators.JSONSchemaValidator;
+import com.quintor.api.validators.SchemaValidator;
+import com.quintor.api.validators.XMLSchemaValidator;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,10 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 @RestController
@@ -33,7 +33,6 @@ public class Mt940Controller {
      * @param file   The file which should be uploaded.
      * @param userId The user id of the user who uploads the file.
      * @return A string with succes when the file has been uploaded. A string with no_file when there is no file. And a string with wrong_user_id when the user id is invalid.
-     * @throws IOException
      */
     @PostMapping("/insert")
     public String insertMt940(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException {
@@ -54,7 +53,6 @@ public class Mt940Controller {
      *
      * @param file The file which should be converted.
      * @return a MultiPartFile object.
-     * @throws IOException
      */
     private MultipartFile convertFileToMultiPartFile(File file) throws IOException {
         if (file == null || !file.exists() || !file.isFile()) {
@@ -63,4 +61,29 @@ public class Mt940Controller {
         InputStream stream = new FileInputStream(file);
         return new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
     }
+
+    /**
+     * This method validates the parsed json from a MT940 file against an json schema
+     *
+     * @param file MT940
+     * @return "Validated" or error message
+     */
+    @PostMapping("/MT940toJSONValidation")
+    public String MT940toJSONValidation(@RequestParam("file") MultipartFile file) {
+        SchemaValidator schemaValidator = new JSONSchemaValidator();
+        return schemaValidator.validateFormat(file);
+    }
+
+    /**
+     * This method validates the parsed json from a MT940 file against an json schema
+     *
+     * @param file MT940
+     * @return "Validated" or error message
+     */
+    @PostMapping("/MT940toXMLValidation")
+    public String MT940toXMLValidation(@RequestParam("file") MultipartFile file) {
+        SchemaValidator schemaValidator = new XMLSchemaValidator();
+        return schemaValidator.validateFormat(file);
+    }
+
 }

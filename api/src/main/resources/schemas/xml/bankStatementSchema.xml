@@ -1,0 +1,322 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="MT940">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="header">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element type="xs:string" name="applicationId"/>
+                            <xs:element type="xs:string" name="serviceId"/>
+                            <xs:element type="xs:string" name="logicalTerminal"/>
+                            <xs:element type="xs:string" name="sessionNumber"/>
+                            <xs:element type="xs:string" name="sequenceNumber"/>
+                            <xs:element type="xs:string" name="receiverAddress"/>
+                            <xs:element type="xs:string" name="messageType"/>
+                            <xs:element type="xs:string" name="mtId"/>
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="tags">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="transactionReferenceNumber">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element type="xs:string" name="name"/>
+                                        <xs:element type="xs:string" name="referenceNumber"/>
+                                        <xs:element type="xs:string" name="description"/>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="accountIdentification">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element type="xs:string" name="name"/>
+                                        <xs:element name="accountNumber">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="21"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="description"/>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="statementNumber">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element type="xs:string" name="name"/>
+                                        <xs:element type="xs:string" name="statementNumber"/>
+                                        <xs:element type="xs:string" name="description"/>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="openingBalance">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element type="xs:string" name="name"/>
+                                        <xs:element name="dCMark">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="C"/>
+                                                    <xs:enumeration value="D"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="date">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="6"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="currency">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="3"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="amount">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="description"/>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="closingBalance">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element type="xs:string" name="name"/>
+                                        <xs:element name="dCMark">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="C"/>
+                                                    <xs:enumeration value="D"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="date">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="6"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="currency">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="3"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="amount">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="description"/>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="closingAvailableBalance" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element type="xs:string" name="name"/>
+                                        <xs:element name="dCMark">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="C"/>
+                                                    <xs:enumeration value="D"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="date">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="6"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="currency">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:length value="3"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="amount">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="description"/>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="forwardAvailableBalances" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="forwardAvailableBalance" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:all>
+                                                    <xs:element name="dCMark">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:enumeration value="C"/>
+                                                                <xs:enumeration value="D"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="date">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:length value="6"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="currency">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:length value="3"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="amount">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                </xs:all>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="transactions" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="transaction" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:all>
+                                                    <xs:element type="xs:string" name="name"/>
+                                                    <xs:element type="xs:string" name="transactionType"/>
+                                                    <xs:element type="xs:string" name="identificationCode"/>
+                                                    <xs:element name="amount">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="entryDate">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:length value="4"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element type="xs:string" name="supplementaryDetails"/>
+                                                    <xs:element name="debitCreditMark">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:enumeration value="C"/>
+                                                                <xs:enumeration value="D"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="valueDate">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:length value="6"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element type="xs:string" name="referenceForTheAccountOwner"/>
+                                                    <xs:element name="referenceOfTheAccountServicingInstitution">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:maxLength value="16"/>
+                                                                <xs:minLength value="14"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="informationToAccountOwner" minOccurs="0">
+                                                        <xs:complexType mixed="true">
+                                                            <xs:all>
+                                                                <xs:element type="xs:string" name="accountOwnerInformationInOneLine" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="returnReason" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="clientReference" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="endToEndReference" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="paymentInformationId" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="instructionId" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="mandateReference" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="creditorId" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="counterPartyId" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="remittanceInformation" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="purposeCode" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="ultimateCreditor" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="ultimateDebitor" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="exchangeRate" minOccurs="0"/>
+                                                                <xs:element type="xs:string" name="charges" minOccurs="0"/>
+                                                            </xs:all>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:all>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="generalInformationToAccountOwner" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element name="numberOfDebitEntries">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="([0-9]\d*)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="numberOfCreditEntries">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="([0-9]\d*)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="debitEntriesTotalAmount">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="creditEntriesTotalAmount">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:pattern value="(0|[1-9]\d*)(,\d+)?"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
