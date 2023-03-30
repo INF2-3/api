@@ -5,7 +5,6 @@ import com.quintor.api.dataobjects.Description;
 import com.quintor.api.dataobjects.Transaction;
 import org.json.JSONArray;
 
-
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;

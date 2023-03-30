@@ -49,7 +49,7 @@ public class AddToTransaction {
         return description;
     }
 
-    public static Category makeCategory(int categoryId, String categoryName){
+    public static Category makeCategory(int categoryId, String categoryName) {
         return new Category(categoryId, categoryName);
 
     }

@@ -10,7 +10,7 @@ public class TransactionList {
         this.list = new ArrayList<>();
     }
 
-    public void add(Transaction transaction){
+    public void add(Transaction transaction) {
         list.add(transaction);
     }
 

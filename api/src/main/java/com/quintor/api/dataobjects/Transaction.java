@@ -1,6 +1,5 @@
 package com.quintor.api.dataobjects;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 
 public class Transaction {
@@ -13,11 +12,9 @@ public class Transaction {
     private String referenceOwner;
     private String institutionReference;
     private String supplementaryDetails;
-    private int originalDescriptionId;
     private Description originalDescription;
     private String description;
     private int fileId;
-    private int categoryId;
     private Category category;
 
     public Transaction(int id, LocalDate valueDate, int entryDate, DebitOrCredit debitOrCredit, double amount, String transactionCode, Description originalDescription, int fileId, Category category) {
