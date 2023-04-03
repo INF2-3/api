@@ -54,7 +54,7 @@ CREATE TABLE "public"."description" (
 
 INSERT INTO "description" ("d_id", "return_reason", "client_reference", "end_to_end_reference", "payment_information_id", "instruction_id", "mandate_reference", "creditor_id", "counterparty_id", "remittance_information", "purpose_code", "ultimate_creditor", "ultimate_debtor", "exchange_rate", "charges") VALUES
 (1,	NULL,	'1',	NULL,	'1',	NULL,	'1',	'1',	'1',	NULL,	'23',	NULL,	'43t5',	'643',	NULL),
-(0,	'een reden',	'een reference',	'nog een reference',	'payment information id',	'instrcuties',	'nog een reference dit keer mandate',	'id van creditor',	'id van counterparyt',	'informatie over remittance',	'code met purpose',	'de ultimate creditor',	'de ultimate debtor',	'de exvhange rate',	'de charges');
+(0,	'een reden',	'een reference',	'nog een reference',	'payment information id',	'instrcuties',	'nog een reference dit keer mandate',	'id van creditor',	'id van counterparyt',	'informatie over remittance',	'code met purpose',	'de ultimate creditor',	'de ultimate debtor',	'de exchange rate',	'de charges');
 
 DROP TABLE IF EXISTS "file";
 DROP SEQUENCE IF EXISTS file_id_seq;
@@ -126,9 +126,9 @@ CREATE TABLE "public"."transaction" (
 ) WITH (oids = false);
 
 INSERT INTO "transaction" ("t_id", "value_date", "entry_date", "debit_credit", "amount", "transaction_code", "reference_owner", "institution_reference", "supplementary_details", "original_description_id", "description", "file_id", "category_id") VALUES
-(1,	'2020-05-22',	522,	'c',	'$254.00',	'fds',	'hgfd',	'gfd',	'gfd',	1,	'Dit gaat een heel verhaal zijn, om te testen of de beschrijving laten zien op de frontend het doet.',	1,	1),
-(2,	'2023-03-27',	2703,	'd',	'$123.00',	'259',	'gafd',	'gds',	'hbgfds',	1,	'gfdshbvfdfrghnbv',	1,	1),
-(0,	'2023-03-30',	8274,	'd',	'$541.00',	'5',	'een referecne',	'34',	'details',	0,	'Dit is een hele goede beschirivjing',	1,	1);
+(2,	'2023-03-27',	2703,	'd',	'$123.00',	'259',	'test',	'test',	'test',	1,	'test',	1,	1),
+(0,	'2023-03-30',	8274,	'd',	'$541.00',	'5',	'een referecne',	'34',	'details',	0,	'Dit is een hele goede beschirivjing',	1,	1),
+(1,	'2020-05-22',	522,	'c',	'$254.00',	'test',	'test',	'test',	'test',	1,	'test',	1,	1);
 
 DROP VIEW IF EXISTS "transactionsview";
 CREATE TABLE "transactionsview" ("t_id" integer, "value_date" date, "entry_date" integer, "debit_credit" character(1), "amount" money, "transaction_code" character varying(4), "reference_owner" character varying(16), "institution_reference" character varying(16), "supplementary_details" character varying(34), "original_description_id" integer, "description" character varying(500), "file_id" integer, "category_id" integer, "c_id" integer, "name" character varying(255), "d_id" integer, "return_reason" character varying(255), "client_reference" character varying(255), "end_to_end_reference" character varying(255), "payment_information_id" character varying(255), "instruction_id" character varying(255), "mandate_reference" character varying(255), "creditor_id" character varying(255), "counterparty_id" character varying(255), "remittance_information" character varying(255), "purpose_code" character varying(255), "ultimate_creditor" character varying(255), "ultimate_debtor" character varying(255), "exchange_rate" character varying(255), "charges" character varying(255));
@@ -194,4 +194,4 @@ CREATE VIEW "transactionsview" AS SELECT transaction.t_id,
      JOIN category ON ((transaction.category_id = category.c_id)))
      JOIN description ON ((transaction.original_description_id = description.d_id)));
 
--- 2023-04-03 08:44:09.821417+00
+-- 2023-04-03 09:32:39.138151+00
