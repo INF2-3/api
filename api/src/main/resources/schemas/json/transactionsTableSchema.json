@@ -116,7 +116,6 @@
           "referenceOfTheAccountServicingInstitution": {
             "type": "string",
             "maxLength": 16,
-            "minLength": 14
           },
           "category": {
             "type": "string"

@@ -24,7 +24,7 @@ public class XMLSchemaValidator extends SchemaValidator {
      */
     @Override
     public String compareToSchema(StringBuffer input, String schemaName) throws SAXException, IOException {
-        InputStream schemaStream = XMLSchemaValidator.class.getClassLoader().getResourceAsStream("schemas/xml/" + schemaName + ".xml");
+        InputStream schemaStream = XMLSchemaValidator.class.getClassLoader().getResourceAsStream("schemas/xml/" + schemaName + ".xsd");
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = factory.newSchema(new StreamSource(schemaStream));
         Validator validator = schema.newValidator();
