@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionPostgres {
-    private static final String url = "jdbc:postgresql://localhost:5432/postgres";
-    private static final String user = "root";
-    private static final String password = "changeme";
+    private static final String url = System.getenv("POSTGRESQL_URL");
+    private static final String user = System.getenv("POSTGRESQL_USER");
+    private static final String password = System.getenv("POSTGRESQL_PASSWORD") ;
 
     /**
      * Creates the connection with a sql query.
