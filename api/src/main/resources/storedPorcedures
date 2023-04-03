@@ -1,0 +1,295 @@
+Create or Replace Procedure Insert_Transaction
+(IN
+   c_value_date date,
+   c_entry_date int,
+   c_debit_credit char,
+   c_amount money,
+   c_transaction_code varchar,
+   c_reference_owner varchar,
+   c_institution_reference varchar,
+   c_supplementary_details varchar,
+   c_original_description_id int,
+   c_description varchar,
+   c_file_id int,
+   c_category_id int
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+   INSERT INTO transaction
+ (
+   t_id,
+   value_date,
+   entry_date,
+   debit_credit,
+   amount,
+   transaction_code,
+   reference_owner,
+   institution_reference,
+   supplementary_details,
+   original_description_id,
+   description,
+   file_id,
+   category_id
+)
+   Values
+ (
+   default,
+   c_value_date,
+   c_entry_date,
+   c_debit_credit,
+   c_amount,
+   c_transaction_code,
+   c_reference_owner,
+   c_institution_reference,
+   c_supplementary_details,
+   c_original_description_id,
+   c_description,
+   c_file_id,
+   c_category_id
+);
+END;
+$$;
+
+
+
+CALL Insert_Transaction
+(
+   '2002-08-30'::date,
+   1245::int,
+   'C'::char,
+   25.12::money,
+   'as12'::varchar,
+   'aaaaaassssssssss'::varchar,
+   'asdfghjklqwertyu'::varchar,
+   'asdasdahskdashjjhkj'::varchar,
+   1::int,
+   'hallo dit is een test'::varchar,
+   1::int,
+   1::int
+)
+
+
+BALANCE
+Create or Replace Procedure Insert_balance
+(IN
+   c_debit_credit char,
+   c_date date,
+   c_currency varchar,
+   c_amount money,
+   c_type varchar,
+   c_file_id int
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+   INSERT INTO balance
+ (
+   b_id,
+   debit_credit,
+   date,
+   currency,
+   amount,
+   type,
+   file_id
+)
+   Values
+ (
+   default,
+   c_debit_credit,
+   c_date,
+   c_currency,
+   c_amount,
+   c_type,
+   c_file_id
+);
+END;
+$$;
+
+
+
+
+CALL Insert_balance
+(
+   'D'::char,
+   '2304-02-12'::date,
+   'EUR'::varchar,
+   34.45::money,
+   'Idk what I am doing'::varchar,
+   1::int
+);
+
+
+
+Create or Replace Procedure Insert_Description
+(IN
+   c_return_reason varchar,
+   c_client_reference varchar,
+   c_end_to_end_reference varchar,
+   c_payment_information_id varchar,
+   c_instruction_id varchar,
+   c_mandate_reference varchar,
+   c_creditor_id varchar,
+   c_counterparty_id varchar,
+   c_remittance_information varchar,
+   c_purpose_code varchar,
+   c_ultimate_creditor varchar,
+   c_ultimate_debtor varchar,
+   c_exchange_rate varchar,
+   c_charges varchar
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+   INSERT INTO description
+ (
+   d_id,
+   return_reason,
+   client_reference,
+   end_to_end_reference,
+   payment_information_id,
+   instruction_id,
+   mandate_reference,
+   creditor_id,
+   counterparty_id,
+   remittance_information,
+   purpose_code,
+   ultimate_creditor,
+   ultimate_debtor,
+   exchange_rate,
+   charges
+)
+   Values
+ (
+   default,
+   c_return_reason,
+   c_client_reference,
+   c_end_to_end_reference,
+   c_payment_information_id,
+   c_instruction_id,
+   c_mandate_reference,
+   c_creditor_id,
+   c_counterparty_id,
+   c_remittance_information,
+   c_purpose_code,
+   c_ultimate_creditor,
+   c_ultimate_debtor,
+   c_exchange_rate,
+   c_charges
+);
+END;
+$$;
+
+
+
+CALL Insert_description
+(
+   'Da'::varchar,
+   'aD'::varchar,
+   'aD'::varchar,
+   'Da'::varchar,
+   'aD'::varchar,
+   'Da'::varchar,
+   'aD'::varchar,
+   'Da'::varchar,
+   'aD'::varchar,
+   'aD'::varchar,
+   'aD'::varchar,
+   'aD'::varchar,
+   'aD'::varchar
+);
+
+
+Create or Replace Procedure insert_file
+(IN
+   c_transaction_reference_number varchar,
+   c_account_number varchar,
+   c_statement_number int,
+   c_file_description_id int,
+   c_last_updated_user int,
+   c_upload_date date,
+   c_filecol varchar
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+   INSERT INTO file
+ (
+   f_id,
+   transaction_reference_number,
+   account_number,
+   statement_number,
+   file_description_id,
+   last_updated_user,
+   upload_date,
+   filecol
+)
+   Values
+ (
+   default,
+   c_transaction_reference_number,
+   c_account_number,
+   c_statement_number,
+   c_file_description_id,
+   c_last_updated_user,
+   c_upload_date,
+   c_filecol
+);
+END;
+$$;
+
+CALL insert_file
+(
+   'AAA'::varchar,
+   'AAA'::varchar,
+   11::int,
+   1::int,
+   1::int,
+   '2343-12-23'::date,
+   'AAA'::varchar
+)
+
+
+Create or Replace Procedure insert_file_description
+(IN
+   c_number_of_debit_entries int,
+   c_number_of_credit_entries int,
+   c_amount_of_debit_entries money,
+   c_amount_of_credit_entries money
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+   INSERT INTO file_description
+ (
+   f_d_id,
+   number_of_debit_entries,
+   number_of_credit_entries,
+   amount_of_debit_entries,
+   amount_of_credit_entries
+)
+   Values
+ (
+   default,
+   c_number_of_debit_entries,
+   c_number_of_credit_entries,
+   c_amount_of_debit_entries,
+   c_amount_of_credit_entries
+);
+END;
+$$;
+
+CALL insert_file_description
+(
+   12::int,
+   23::int,
+   23.56::money,
+   89.34::money
+);
+
+
