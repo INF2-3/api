@@ -1,24 +1,15 @@
 package com.quintor.api.postgreSqlConnection;
 
-import com.quintor.api.mt940.Json;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -34,11 +25,9 @@ public class PostgreSqlController {
     private final String password = "changeme";
 
     @PostMapping("/insert")
-    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, SQLException, ParseException {
+    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, ParseException {
 
         System.out.println("in endpoint");
-        //remove when using postman to test
-        //MultipartFile multipartFile = convertFileToMultiPartFile(file);
         if (file == null) {
             return "no_file";
         }
@@ -49,17 +38,13 @@ public class PostgreSqlController {
 
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(jsonString);
-        //System.out.println(json);
         // Step 1: Establishing a Connection
         try (Connection connection = DriverManager.getConnection(url, user, password)){
              // Step 2:Create a statement using connection object
-            //PreparedStatement preparedStatement = connection.prepareStatement(SQL);
             assert json != null;
             insertInPostgres(json);
 
-            //System.out.println(preparedStatement);
             // Step 3: Execute the query or update query
-          //  preparedStatement.executeUpdate();
         }catch (SQLException e) {
 
             // print SQL exception information
@@ -75,7 +60,6 @@ public class PostgreSqlController {
         URL api = new URL(url);
         HttpURLConnection httpURLConnection = (HttpURLConnection) api.openConnection();
 
-        //System.out.println(response);
         httpURLConnection.setRequestMethod("POST");
         httpURLConnection.setRequestProperty("Accept", "application/json");
         httpURLConnection.setDoOutput(true);
@@ -88,7 +72,6 @@ public class PostgreSqlController {
         int responseCode = httpURLConnection.getResponseCode();
         System.out.println("POST Response Code :: " + responseCode);
 
-        JSONObject test;
         if (responseCode == HttpURLConnection.HTTP_OK) { // success
             BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             String inputLine;
@@ -98,11 +81,9 @@ public class PostgreSqlController {
                 sb.append(inputLine);
             }
             String response2 = sb.toString();
-            //System.out.println(response2);
             test = getResponse(httpURLConnection);
             in.close();
             return response2;
-            // print result
         } else {
             System.out.println("POST request not worked");
         }
