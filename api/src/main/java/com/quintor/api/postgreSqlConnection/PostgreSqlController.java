@@ -4,13 +4,10 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -23,7 +20,10 @@ public class PostgreSqlController {
     private final String url = "jdbc:postgresql://localhost:5432/postgres";
     private final String user = "root";
     private final String password = "changeme";
-
+    /*
+     * Function inserts MT940 JSON from parser into POSTGRESQL
+     * It calls the function insertInPostgres(json) if json is not null
+     * */
     @PostMapping("/insert")
     public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, ParseException {
 
@@ -55,6 +55,10 @@ public class PostgreSqlController {
         return "done";
     }
 
+    /*
+    * sets up connection with parser
+    * and returns String gotten from parser wht getResponse()
+    */
     private String parser(File file) throws IOException {
         String url = "http://localhost:9091" + "/MT940toJSON";
         URL api = new URL(url);
@@ -81,7 +85,6 @@ public class PostgreSqlController {
                 sb.append(inputLine);
             }
             String response2 = sb.toString();
-            test = getResponse(httpURLConnection);
             in.close();
             return response2;
         } else {
@@ -92,6 +95,9 @@ public class PostgreSqlController {
         return null;
     }
 
+    /*
+    * gets response from endpoint in bufferedReader and into string
+    */
     private JSONObject getResponse(HttpURLConnection httpURLConnection) throws IOException {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
@@ -116,6 +122,10 @@ public class PostgreSqlController {
         }
     }
 
+    /*
+    * gets tags from the json and inserts it into postgresql
+    * with stored procedures. does table after table
+    */
     private void insertInPostgres(JSONObject json) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         //get tag for the table
@@ -280,17 +290,5 @@ public class PostgreSqlController {
             throw new RuntimeException(e);
         }
         }
-
-
     }
-
-
-    private MultipartFile convertFileToMultiPartFile(File file) throws IOException {
-        if (file == null || !file.exists() || !file.isFile()) {
-            return null;
-        }
-        InputStream stream = new FileInputStream(file);
-        return new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
-    }
-
 }
