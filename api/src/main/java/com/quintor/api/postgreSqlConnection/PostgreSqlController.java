@@ -27,7 +27,6 @@ public class PostgreSqlController {
     @PostMapping("/insert")
     public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, ParseException {
 
-        System.out.println("in endpoint");
         if (file == null) {
             return "no_file";
         }

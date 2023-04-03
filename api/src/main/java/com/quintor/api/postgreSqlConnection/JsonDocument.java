@@ -7,13 +7,13 @@ import javax.persistence.Id;
 
 //declares the collection of the database
 @Document(collection = "file")
-public class Json {
+public class JsonDocument {
     @Id
     private String id;
     private JSONObject file;
     private int uploadUser;
 
-    public Json(JSONObject file, int uploadUser) {
+    public JsonDocument(JSONObject file, int uploadUser) {
         this.file = file;
         this.uploadUser = uploadUser;
     }
