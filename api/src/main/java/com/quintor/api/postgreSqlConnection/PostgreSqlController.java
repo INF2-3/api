@@ -214,7 +214,7 @@ public class PostgreSqlController {
             ps.setString(3, (String) closingAvailableBalance.get("currency"));
             ps.setString(4, (String) closingAvailableBalance.get("amount"));
             ps.setString(5, "closingAvailableBalance"); //type
-            ps.setInt(6, 2); //File_id
+            ps.setInt(6, fileId); //File_id
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -228,7 +228,7 @@ public class PostgreSqlController {
             ps.setString(3, (String) openingBalance.get("currency"));
             ps.setString(4, (String) openingBalance.get("amount"));
             ps.setString(5, "openingBalance"); //type
-            ps.setInt(6, 2); //File_id
+            ps.setInt(6, fileId); //File_id
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -245,7 +245,7 @@ public class PostgreSqlController {
                 ps.setString(3, (String) forwardAvailableBalance.get("currency"));
                 ps.setString(4, (String) forwardAvailableBalance.get("amount"));
                 ps.setString(5, "forwardAvailableBalance"); //type
-                ps.setInt(6, 2); //File_id
+                ps.setInt(6, fileId); //File_id
                 ps.executeUpdate();
             }catch (SQLException e){
                 throw new RuntimeException(e);
@@ -256,6 +256,7 @@ public class PostgreSqlController {
         //transactions
         JSONArray transactions = (JSONArray) tags.get("transactions");
         for(int n = 0; n < transactions.size(); n++) {
+            //get descriptionID!!!
             JSONObject transaction = (JSONObject) transactions.get(n);
             JSONObject description = (JSONObject) transaction.get("informationToAccountOwner");
             try{
@@ -271,7 +272,7 @@ public class PostgreSqlController {
                 ps.setString(8, (String) transaction.get("supplementaryDetails"));
                 ps.setInt(9,2);                       //original_description_ID
                 ps.setString(10, "This is a description");                  //description
-                ps.setInt(11, 11);                     //fileID
+                ps.setInt(11, 11);                     //userID
                 ps.setInt(12, fileId); //catagoryID
                 ps.setInt(12, 1); //catagoryID
                 ps.executeUpdate();
@@ -299,18 +300,7 @@ public class PostgreSqlController {
             throw new RuntimeException(e);
         }
         }
-        //Loop with forEach transaction in transactions to get all te rows
-        //transactions.get("amount");
 
-
-        //informationToAccountOwner{ endToEndReference, ...... }
-       // JSONObject accountOwnerInfo = (JSONObject) transactions.get("informationToAccountOwner");
-        //paymentInformationId, ultimateCreditor, endToEndReference, ultimateDebitor, counterPartyId, mandateReference, charges, accountOwnerInformationInOneLine, remittanceInformation, exchangeRate, returnReason, purposeCode, clientReference, instructionId, creditorId
-
-
-        String sqlTransaction = "CALL Insert_Transaction(?::date, ?::int, ?::char, ?::money, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::int, ?::varchar, ?::int, ?::int)";
-        System.out.println("in insertPostgress");
-        //get tag for the column
 
     }
 
