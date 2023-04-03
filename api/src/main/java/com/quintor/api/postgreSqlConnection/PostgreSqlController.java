@@ -272,8 +272,7 @@ public class PostgreSqlController {
                 ps.setString(8, (String) transaction.get("supplementaryDetails"));
                 ps.setInt(9,2);                       //original_description_ID
                 ps.setString(10, "This is a description");                  //description
-                ps.setInt(11, 11);                     //userID
-                ps.setInt(12, fileId); //catagoryID
+                ps.setInt(11, fileId); //catagoryID
                 ps.setInt(12, 1); //catagoryID
                 ps.executeUpdate();
 
