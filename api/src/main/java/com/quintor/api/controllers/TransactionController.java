@@ -6,6 +6,7 @@ import com.quintor.api.toJson.ToJSON;
 import com.quintor.api.toXml.ToXML;
 import org.json.JSONArray;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,6 +41,27 @@ public class TransactionController {
         try {
             List<Transaction> allTransactions = ConnectionPostgres.getAllTransactions();
             return ToXML.transactionsToXML(allTransactions);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("getTransactionJSON/{id}")
+    public String getTransactionByIdJSON(@PathVariable String id) {
+        int intId = Integer.parseInt(id);
+        try {
+            return ToJSON.transactionToJSON(ConnectionPostgres.getTransactionById(intId)).toString();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("getTransactionXML/{id}")
+    public String getTransactionByIdXML(@PathVariable String id){
+        int intId = Integer.parseInt(id);
+        try {
+            return ToXML.transactionToXML(ConnectionPostgres.getTransactionById(intId));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
