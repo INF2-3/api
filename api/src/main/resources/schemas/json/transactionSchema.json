@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "http://quintor.com/transactions.json",
+  "title": "transactions schema",
+  "type": "object",
+  "description": "This schema validates transactions from the database",
+  "required": [
+    "transactions"
+  ],
+  "properties": {
+    "transactions": {
+      "description": "Schema for optional 61 tags",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "transactionType",
+          "identificationCode",
+          "amount",
+          "entryDate",
+          "name",
+          "debitCreditMark",
+          "valueDate",
+          "referenceForTheAccountOwner"
+        ],
+        "properties": {
+          "transactionType": {
+            "type": "string",
+            "maxLength": 4
+          },
+          "identificationCode": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+            "description": "This pattern checks if amount is a number greater than or equal to 0"
+          },
+          "entryDate": {
+            "type": "string",
+            "maxLength": 4,
+            "minLength": 4
+          },
+          "informationToAccountOwner": {
+            "title": "Schema for the optional 86 tag inside a transaction (61 tag)",
+            "type": "object",
+            "properties": {
+              "paymentInformationId": {
+                "type": "string"
+              },
+              "ultimateCreditor": {
+                "type": "string"
+              },
+              "endToEndReference": {
+                "type": "string"
+              },
+              "ultimateDebitor": {
+                "type": "string"
+              },
+              "counterPartyId": {
+                "type": "string"
+              },
+              "mandateReference": {
+                "type": "string"
+              },
+              "charges": {
+                "type": "string"
+              },
+              "accountOwnerInformationInOneLine": {
+                "type": "string"
+              },
+              "remittanceInformation": {
+                "type": "string"
+              },
+              "exchangeRate": {
+                "type": "string"
+              },
+              "returnReason": {
+                "type": "string",
+                "maxLength": 4
+              },
+              "purposeCode": {
+                "type": "string"
+              },
+              "clientReference": {
+                "type": "string"
+              },
+              "instructionId": {
+                "type": "string"
+              },
+              "creditorId": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "supplementaryDetails": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "debitCreditMark": {
+          "type": "string",
+          "enum": ["D", "C"]
+        },
+        "valueDate": {
+          "type": "string",
+          "maxLength": 6,
+          "minLength": 6
+        },
+        "referenceForTheAccountOwner": {
+          "type": "string"
+        },
+        "referenceOfTheAccountServicingInstitution": {
+          "type": "string",
+          "maxLength": 16
+        }
+      }
+    }
+  }
+}
