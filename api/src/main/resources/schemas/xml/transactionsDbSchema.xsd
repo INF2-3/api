@@ -1,0 +1,70 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transaction" maxOccurs="unbounded" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:int" name="id"/>
+                            <xs:element type="valueDateType" name="valueDate"/>
+                            <xs:element type="entryDateType" name="entryDate"/>
+                            <xs:element type="debitCreditType" name="debitOrCredit"/>
+                            <xs:element type="xs:double" name="amount"/>
+                            <xs:element type="xs:string" name="transactionCode"/>
+                            <xs:element type="xs:string" name="referenceOwner"/>
+                            <xs:element type="xs:string" name="institutionReference"/>
+                            <xs:element type="xs:string" name="supplementaryDetails"/>
+                            <xs:element name="originalDescription">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:byte" name="descriptionId"/>
+                                        <xs:element type="xs:string" name="returnReason" minOccurs="0"/>
+                                        <xs:element type="xs:string" name="clientReference"/>
+                                        <xs:element type="xs:string" name="endToEndReference" minOccurs="0"/>
+                                        <xs:element type="xs:string" name="paymentInformationId"/>
+                                        <xs:element type="xs:string" name="instructionId" minOccurs="0"/>
+                                        <xs:element type="xs:string" name="mandateReference"/>
+                                        <xs:element type="xs:string" name="creditorId"/>
+                                        <xs:element type="xs:string" name="counterpartyId"/>
+                                        <xs:element type="xs:string" name="remittanceInformation" minOccurs="0"/>
+                                        <xs:element type="xs:string" name="purposeCode"/>
+                                        <xs:element type="xs:string" name="ultimateCreditor" minOccurs="0"/>
+                                        <xs:element type="xs:string" name="ultimateDebitor"/>
+                                        <xs:element type="xs:string" name="exchangeRate"/>
+                                        <xs:element type="xs:string" name="charges" minOccurs="0"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element type="xs:string" name="description"/>
+                            <xs:element type="xs:int" name="fileId"/>
+                            <xs:element name="category">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:int" name="categoryId"/>
+                                        <xs:element type="xs:string" name="name"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:simpleType name="valueDateType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="debitCreditType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="CREDIT"/>
+            <xs:enumeration value="DEBIT"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="entryDateType">
+        <xs:restriction base="xs:string">
+            <xs:length value="4"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

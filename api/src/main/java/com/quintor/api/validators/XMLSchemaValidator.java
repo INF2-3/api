@@ -23,12 +23,12 @@ public class XMLSchemaValidator extends SchemaValidator {
      * @return returns "Validated" if no errors occur, otherwise throw exception
      */
     @Override
-    public String compareToSchema(StringBuffer input, String schemaName) throws SAXException, IOException {
+    public String compareToSchema(String input, String schemaName) throws SAXException, IOException {
         InputStream schemaStream = XMLSchemaValidator.class.getClassLoader().getResourceAsStream("schemas/xml/" + schemaName + ".xsd");
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = factory.newSchema(new StreamSource(schemaStream));
         Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(new ByteArrayInputStream(input.toString().getBytes(StandardCharsets.UTF_8))));
-        return "Validated";
+        validator.validate(new StreamSource(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))));
+        return input;
     }
 }
