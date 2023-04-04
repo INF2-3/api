@@ -1,0 +1,444 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "http://main.com/schema.json",
+  "title": "Main schema",
+  "type": "object",
+  "description": "This schema validates against the custom json MT940 file that gets parsed by the JSONParser",
+  "required": [
+    "header",
+    "tags"
+  ],
+  "properties": {
+    "header": {
+      "title": "Schema for header",
+      "type": "object",
+      "required": [
+        "logicalTerminal",
+        "receiverAddress",
+        "sequenceNumber",
+        "mtId",
+        "sessionNumber",
+        "messageType",
+        "applicationId",
+        "serviceId"
+      ],
+      "properties": {
+        "logicalTerminal": {
+          "description": "Schema for logical terminal",
+          "type": "string",
+          "default": ""
+        },
+        "receiverAddress": {
+          "description": "Schema for receiver address",
+          "type": "string",
+          "default": ""
+        },
+        "sequenceNumber": {
+          "description": "Schema for sequence number",
+          "type": "string",
+          "default": ""
+        },
+        "mtId": {
+          "description": "Schema for mt id",
+          "type": "string",
+          "default": ""
+        },
+        "sessionNumber": {
+          "description": "Schema for session number",
+          "type": "string",
+          "default": ""
+        },
+        "messageType": {
+          "description": "Schema for message type",
+          "type": "string",
+          "default": ""
+        },
+        "applicationId": {
+          "description": "Schema for application id",
+          "type": "string",
+          "default": ""
+        },
+        "serviceId": {
+          "description": "Schema for service id",
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "tags": {
+      "title": "Schema for tags",
+      "type": "object",
+      "required": [
+        "accountIdentification",
+        "transactionReferenceNumber",
+        "closingBalance",
+        "statementNumber",
+        "openingBalance"
+      ],
+      "properties": {
+        "forwardAvailableBalance": {
+          "description": "Schema for optional tag 65",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "date",
+              "currency",
+              "amount",
+              "dCMark"
+            ],
+            "properties": {
+              "date": {
+                "type": "string",
+                "maxLength": 6,
+                "minLength": 6
+              },
+              "currency": {
+                "type": "string",
+                "maxLength": 3,
+                "minLength": 3
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+                "description": "This pattern checks if amount is a number greater than or equal to 0"
+              },
+              "dCMark": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "closingAvailableBalance": {
+          "description": "Schema for optional tag 64",
+          "type": "object",
+          "required": [
+            "name",
+            "date",
+            "description",
+            "currency",
+            "amount",
+            "dCMark"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "default": "64"
+            },
+            "date": {
+              "type": "string",
+              "maxLength": 6,
+              "minLength": 6
+            },
+            "description": {
+              "type": "string",
+              "default": "This tag specifies for the closing available balance, whether it is a debit or credit\nbalance, the date, the currency and the amount of the balance"
+            },
+            "currency": {
+              "type": "string",
+              "maxLength": 3,
+              "minLength": 3
+            },
+            "amount": {
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "description": "This pattern checks if amount is a number greater than or equal to 0"
+            },
+            "dCMark": {
+              "type": "string",
+              "enum": ["C", "D"]
+            }
+          }
+        },
+        "generalInformationToAccountOwner": {
+          "description": "Schema for optional tag 86 at the end of the mt940 file",
+          "type": "object",
+          "required": [
+            "numberOfDebitEntries",
+            "numberOfCreditEntries",
+            "debitEntriesTotalAmount",
+            "creditEntriesTotalAmount"
+          ],
+          "properties": {
+            "numberOfDebitEntries": {
+              "type": "string",
+              "pattern": "^([0-9]\\d*)?$"
+            },
+            "numberOfCreditEntries": {
+              "type": "string",
+              "pattern": "^([0-9]\\d*)?$"
+            },
+            "debitEntriesTotalAmount": {
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$"
+            },
+            "creditEntriesTotalAmount": {
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$"
+            }
+          }
+        },
+        "accountIdentification": {
+          "description": "Schema for mandatory tag 25",
+          "type": "object",
+          "required": [
+            "name",
+            "accountNumber",
+            "description"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "default": "25"
+            },
+            "accountNumber": {
+              "type": "string",
+              "minLength": 21,
+              "maxLength": 21,
+              "description": "Schema for account number only for Netherlands, which is IBAN + ISO currency code"
+            },
+            "description": {
+              "type": "string",
+              "default": "This tag identifies the account for which the statement is sent"
+            }
+          }
+        },
+        "transactionReferenceNumber": {
+          "description": "Schema for mandatory tag 20",
+          "type": "object",
+          "required": [
+            "name",
+            "referenceNumber",
+            "description"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "default": "20"
+            },
+            "referenceNumber": {
+              "type": "string",
+              "default": ""
+            },
+            "description": {
+              "type": "string",
+              "default": "This tag specifies the reference assigned by the Sender to unambiguously identify\\nthe message."
+            }
+          }
+        },
+        "closingBalance": {
+          "description": "Schema for mandatory tag 62F",
+          "type": "object",
+          "required": [
+            "name",
+            "date",
+            "description",
+            "currency",
+            "amount",
+            "dCMark"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "default": "62F"
+            },
+            "date": {
+              "type": "string",
+              "maxLength": 6,
+              "minLength": 6
+            },
+            "description": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string",
+              "maxLength": 3,
+              "minLength": 3
+            },
+            "amount": {
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "description": "This pattern checks if amount is a number greater than or equal to 0"
+            },
+            "dCMark": {
+              "type": "string",
+              "enum": ["C", "D"]
+            }
+          }
+        },
+        "transactions": {
+          "description": "Schema for optional 61 tags",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "transactionType",
+              "identificationCode",
+              "amount",
+              "entryDate",
+              "name",
+              "debitCreditMark",
+              "valueDate",
+              "referenceForTheAccountOwner"
+            ],
+            "properties": {
+              "transactionType": {
+                "type": "string"
+              },
+              "identificationCode": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+                "description": "This pattern checks if amount is a number greater than or equal to 0"
+              },
+              "entryDate": {
+                "type": "string",
+                "maxLength": 4,
+                "minLength": 4
+              },
+              "informationToAccountOwner": {
+                "title": "Schema for the optional 86 tag inside a transaction (61 tag)",
+                "type": "object",
+                "properties": {
+                  "paymentInformationId": {
+                    "type": "string"
+                  },
+                  "ultimateCreditor": {
+                    "type": "string"
+                  },
+                  "endToEndReference": {
+                    "type": "string"
+                  },
+                  "ultimateDebitor": {
+                    "type": "string"
+                  },
+                  "counterPartyId": {
+                    "type": "string"
+                  },
+                  "mandateReference": {
+                    "type": "string"
+                  },
+                  "charges": {
+                    "type": "string"
+                  },
+                  "accountOwnerInformationInOneLine": {
+                    "type": "string"
+                  },
+                  "remittanceInformation": {
+                    "type": "string"
+                  },
+                  "exchangeRate": {
+                    "type": "string"
+                  },
+                  "returnReason": {
+                    "type": "string"
+                  },
+                  "purposeCode": {
+                    "type": "string"
+                  },
+                  "clientReference": {
+                    "type": "string"
+                  },
+                  "instructionId": {
+                    "type": "string"
+                  },
+                  "creditorId": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "supplementaryDetails": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "debitCreditMark": {
+              "type": "string",
+              "enum": ["D", "C"]
+            },
+            "valueDate": {
+              "type": "string",
+              "maxLength": 6,
+              "minLength": 6
+            },
+            "referenceForTheAccountOwner": {
+              "type": "string"
+            },
+            "referenceOfTheAccountServicingInstitution": {
+              "type": "string",
+              "maxLength": 16,
+              "minLength": 16
+            }
+          }
+        },
+        "statementNumber": {
+          "description": "Schema for mandatory 28C tag",
+          "type": "object",
+          "required": [
+            "name",
+            "statementNumber",
+            "description"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "statementNumber": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string",
+              "default": "This tag contains the sequential number of the statement"
+            }
+          }
+        },
+        "openingBalance": {
+          "description": "Schema for mandatory 60F tag",
+          "type": "object",
+          "required": [
+            "date",
+            "description",
+            "currency",
+            "amount",
+            "name",
+            "dCMark"
+          ],
+          "properties": {
+
+            "date": {
+              "type": "string",
+              "maxLength": 6,
+              "minLength": 6
+            },
+            "description": {
+              "type": "string",
+              "default": "This tag specifies, for the opening balance, whether it is a debit or credit balance,\\nthe date, the currency and the amount of the balance."
+            },
+            "currency": {
+              "type": "string",
+              "maxLength": 3,
+              "minLength": 3
+            },
+            "amount": {
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "description": "This pattern checks if amount is a number greater than or equal to 0"
+            },
+            "name": {
+              "type": "string",
+              "default": "60F"
+            },
+            "dCMark": {
+              "type": "string",
+              "enum": ["C", "D"]
+            }
+          }
+        }
+      }
+    }
+  }
+}
