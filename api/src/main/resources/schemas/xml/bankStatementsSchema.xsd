@@ -25,8 +25,6 @@
       <xs:element name="closingBalance">
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:enumeration value="C"/>
-            <xs:enumeration value="D"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:element>

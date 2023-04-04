@@ -8,14 +8,12 @@
   ],
   "properties":{
     "bankStatements":{
-      "$id":"#root/bankStatements",
       "title":"Bankstatements",
       "type":"array",
       "default":[
 
       ],
       "items":{
-        "$id":"#root/bankStatements/items",
         "title":"Items",
         "type":"object",
         "required":[
@@ -27,7 +25,6 @@
         ],
         "properties":{
           "id":{
-            "$id":"#root/bankStatements/items/id",
             "title":"Id",
             "type":"integer",
             "examples":[
@@ -36,7 +33,6 @@
             "default":0
           },
           "accountNumber":{
-            "$id":"#root/bankStatements/items/accountNumber",
             "title":"Accountnumber",
             "type":"string",
             "default":"",
@@ -46,33 +42,29 @@
             "pattern":"^.*$"
           },
           "uploadDate":{
-            "$id":"#root/bankStatements/items/uploadDate",
             "title":"Uploaddate",
             "type":"string",
             "default":"",
             "examples":[
               "140220"
             ],
-            "pattern":"^.*$"
+            "maxLength": 6,
+            "minLength": 6
           },
           "closingBalance":{
-            "$id":"#root/bankStatements/items/closingBalance",
             "title":"Closingbalance",
-            "type":"number",
-            "examples":[
-              555.3
-            ],
-            "default":0.0
+            "type":"string",
+            "default":0.0,
+            "pattern": "^-?\\d+(\\.\\d{1,2})?$"
           },
           "uploader":{
-            "$id":"#root/bankStatements/items/uploader",
             "title":"Uploader",
             "type":"string",
             "default":"",
             "examples":[
-              "joe"
+              "john"
             ],
-            "pattern":"^.*$"
+            "pattern":"^[a-zA-Z ]+$"
           }
         }
       }
