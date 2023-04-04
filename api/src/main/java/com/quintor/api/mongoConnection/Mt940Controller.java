@@ -71,7 +71,7 @@ public class Mt940Controller {
     @PostMapping("/MT940toJSONValidation")
     public String MT940toJSONValidation(@RequestParam("file") MultipartFile file) {
         SchemaValidator schemaValidator = new JSONSchemaValidator();
-        return schemaValidator.validateFormat(file);
+        return schemaValidator.validateFormat(file, "bankStatementSchema");
     }
 
     /**
@@ -83,7 +83,7 @@ public class Mt940Controller {
     @PostMapping("/MT940toXMLValidation")
     public String MT940toXMLValidation(@RequestParam("file") MultipartFile file) {
         SchemaValidator schemaValidator = new XMLSchemaValidator();
-        return schemaValidator.validateFormat(file);
+        return schemaValidator.validateFormat(file, "bankStatementSchema");
     }
 
 }
