@@ -26,7 +26,10 @@ public class AddToTransaction {
      * @param category             the category of the transaction
      * @return a Transaction object
      */
-    public static Transaction makeTransaction(int id, LocalDate valueDate, int entryDate, String debCred, double amount, String transactionCode, String referenceOwner, String institutionReference, String supplementaryDetails, Description originalDescription, String description, int fileId, Category category) {
+    public static Transaction makeTransaction(int id, LocalDate valueDate, int entryDate, String debCred, double amount,
+                                              String transactionCode, String referenceOwner, String institutionReference,
+                                              String supplementaryDetails, Description originalDescription, String description,
+                                              int fileId, Category category) {
         DebitOrCredit debitOrCredit;
         if (debCred.equals("c") || debCred.equals("C")) {
             debitOrCredit = DebitOrCredit.CREDIT;
