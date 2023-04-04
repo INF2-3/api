@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "http://main.com/schema.json",
-  "title": "Main schema",
+  "$id": "http://quintor.com/bankStatementSchema.json",
+  "title": "Bank statement schema",
   "type": "object",
   "description": "This schema validates against the custom json MT940 file that gets parsed by the JSONParser",
   "required": [
@@ -195,6 +195,7 @@
               "type": "string",
               "minLength": 21,
               "maxLength": 21,
+              "pattern": "NL[0-9]{2}[A-z0-9]{4}[0-9]{10}[A-Z]{3}",
               "description": "Schema for account number only for Netherlands, which is IBAN + ISO currency code"
             },
             "description": {
@@ -218,7 +219,7 @@
             },
             "referenceNumber": {
               "type": "string",
-              "default": ""
+              "maxLength": 16
             },
             "description": {
               "type": "string",
@@ -283,7 +284,8 @@
             ],
             "properties": {
               "transactionType": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 4
               },
               "identificationCode": {
                 "type": "string"
@@ -333,7 +335,8 @@
                     "type": "string"
                   },
                   "returnReason": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 4
                   },
                   "purposeCode": {
                     "type": "string"
@@ -348,30 +351,32 @@
                     "type": "string"
                   }
                 }
+              },
+              "supplementaryDetails": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "debitCreditMark": {
+                "type": "string",
+                "enum": [
+                  "D",
+                  "C"
+                ]
+              },
+              "valueDate": {
+                "type": "string",
+                "maxLength": 6,
+                "minLength": 6
+              },
+              "referenceForTheAccountOwner": {
+                "type": "string"
+              },
+              "referenceOfTheAccountServicingInstitution": {
+                "type": "string",
+                "maxLength": 16
               }
-            },
-            "supplementaryDetails": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "debitCreditMark": {
-              "type": "string",
-              "enum": ["D", "C"]
-            },
-            "valueDate": {
-              "type": "string",
-              "maxLength": 6,
-              "minLength": 6
-            },
-            "referenceForTheAccountOwner": {
-              "type": "string"
-            },
-            "referenceOfTheAccountServicingInstitution": {
-              "type": "string",
-              "maxLength": 16,
-              "minLength": 16
             }
           }
         },
@@ -388,7 +393,8 @@
               "type": "string"
             },
             "statementNumber": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 5
             },
             "description": {
               "type": "string",

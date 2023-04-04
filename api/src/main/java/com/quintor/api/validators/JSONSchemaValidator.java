@@ -25,8 +25,8 @@ public class JSONSchemaValidator extends SchemaValidator {
      * @throws IOException
      */
     @Override
-    public String compareToSchema(StringBuffer input) throws IOException {
-        InputStream schemaStream = JSONSchemaValidator.class.getClassLoader().getResourceAsStream("schemas/json/bankStatementSchema.json");
+    public String compareToSchema(StringBuffer input, String schemaName) throws IOException {
+        InputStream schemaStream = JSONSchemaValidator.class.getClassLoader().getResourceAsStream("schemas/json/" + schemaName + ".json");
         JsonSchema jsonSchema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(schemaStream);
 
         ObjectMapper objectMapper = new ObjectMapper();
