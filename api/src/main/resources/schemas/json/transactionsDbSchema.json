@@ -27,9 +27,10 @@
       },
       "entryDate": {
         "$id": "#root/items/entryDate",
-        "type": "integer",
+        "type": "string",
         "maxLength": 4,
-        "minLength": 4
+        "minLength": 4,
+        "pattern": "^\\d{4}$"
       },
       "supplementaryDetails": {
         "$id": "#root/items/supplementaryDetails",

@@ -48,7 +48,7 @@ public class ConnectionPostgres {
         while (result.next()) {
             int id = result.getInt("c_id");
             LocalDate valueDate = result.getDate("value_date").toLocalDate();
-            int entryDate = result.getInt("entry_date");
+            String entryDate = result.getString("entry_date");
             String debCred = result.getString("debit_credit");
             double amount = result.getDouble("amount");
             String transactionCode = result.getString("transaction_code");

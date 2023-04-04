@@ -40,6 +40,6 @@ public class JSONSchemaValidator extends SchemaValidator {
         if (errorsCombined.equals("")) {
             return input;
         }
-        return errorsCombined;
+        throw new IOException(errorsCombined);
     }
 }
