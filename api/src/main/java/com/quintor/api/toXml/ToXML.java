@@ -21,4 +21,10 @@ public class ToXML {
         xStream.addImplicitCollection(TransactionList.class, "list");
         return xStream.toXML(allTransactions);
     }
+
+    public static String transactionToXML(Transaction transaction){
+        XStream xStream = new XStream();
+        xStream.alias("transaction", Transaction.class);
+        return xStream.toXML(transaction);
+    }
 }
