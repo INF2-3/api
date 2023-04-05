@@ -1,4 +1,4 @@
-package com.quintor.api.mongoConnection;
+package com.quintor.api.mt940;
 
 import org.springframework.stereotype.Service;
 

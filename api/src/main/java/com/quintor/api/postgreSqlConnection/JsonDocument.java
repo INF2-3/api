@@ -1,18 +1,19 @@
-package com.quintor.api.mongoConnection;
+package com.quintor.api.mt940;
 
+import net.minidev.json.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
 
 //declares the collection of the database
 @Document(collection = "file")
-public class Mt940 {
+public class JsonDocument {
     @Id
     private String id;
-    private String file;
+    private JSONObject file;
     private int uploadUser;
 
-    public Mt940(String file, int uploadUser) {
+    public JsonDocument(JSONObject file, int uploadUser) {
         this.file = file;
         this.uploadUser = uploadUser;
     }
@@ -25,11 +26,11 @@ public class Mt940 {
         this.id = id;
     }
 
-    public String getFile() {
+    public JSONObject getFile() {
         return this.file;
     }
 
-    public void setFile(String file) {
+    public void setFile(JSONObject file) {
         this.file = file;
     }
 
