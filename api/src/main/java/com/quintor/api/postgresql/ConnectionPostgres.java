@@ -1,8 +1,6 @@
 package com.quintor.api.postgresql;
 
-import com.quintor.api.dataobjects.Category;
-import com.quintor.api.dataobjects.Description;
-import com.quintor.api.dataobjects.Transaction;
+import com.quintor.api.dataobjects.*;
 import org.json.JSONArray;
 
 import java.sql.*;
@@ -92,7 +90,31 @@ public class ConnectionPostgres {
         return allTransactions;
     }
 
+    public static List<BankStatement> getAllBankStatements() throws SQLException {
+        List<BankStatement> allBankStatements = new ArrayList<>();
 
+        String sql = "SELECT * FROM bankstatementsview";
+        ResultSet result = ConnectionPostgres.createConnection(sql);
+
+        while (result.next()) {
+            int id = result.getInt("f_id");
+            String transActionReferenceNumber = result.getString("f_transaction_reference_number");
+            String accountNumber = result.getString("f_account_number");
+            int statementNumber = result.getInt("f_statement_number");
+            int fileDescriptionId = result.getInt("f_file_description_id");
+            LocalDate uploadDate = result.getDate("f_upload_date").toLocalDate();
+            int lastUpdatedUser = result.getInt("f_last_updated_user");
+            int numberOfDebitEntries = result.getInt("f_d_number_of_debit_entries");
+            int numberOfCreditEntries = result.getInt("f_d_number_of_credit_entries");
+            double amountOfDebitEntries = result.getDouble("f_d_amount_of_debit_entries");
+            double amountOfCreditEntries = result.getDouble("f_d_amount_of_credit_entries");
+
+            FileDescription fileDescription = new FileDescription(fileDescriptionId, numberOfDebitEntries, numberOfCreditEntries, amountOfDebitEntries, amountOfCreditEntries);
+            BankStatement bankStatement = new BankStatement(id, transActionReferenceNumber, accountNumber, statementNumber, fileDescription, lastUpdatedUser, uploadDate);
+            allBankStatements.add(bankStatement);
+        }
+        return allBankStatements;
+    }
 
 
 }
