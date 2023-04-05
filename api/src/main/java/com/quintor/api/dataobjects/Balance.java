@@ -11,12 +11,12 @@ public class Balance {
     private BalanceType type;
 
     public Balance(int id, DebitOrCredit debitOrCredit, LocalDate date, String currency, double amount, BalanceType type) {
-        this.id = id;
-        this.debitOrCredit = debitOrCredit;
-        this.date = date;
-        this.currency = currency;
-        this.amount = amount;
-        this.type = type;
+        setId(id);
+        setDebitOrCredit(debitOrCredit);
+        setDate(date);
+        setCurrency(currency);
+        setAmount(amount);
+        setType(type);
     }
 
     public int getId() {

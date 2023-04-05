@@ -112,10 +112,28 @@ public class ConnectionPostgres {
             String userName = result.getString("u_username");
             int roleId = result.getInt("u_role_id");
 
+            int closingBalanceId = result.getInt("b_id");
+            String closingBalanceDebitCreditString = result.getString("b_debit_credit");
+            DebitOrCredit closingBalanceDebitOrCredit = null;
+            if (closingBalanceDebitCreditString.equals("c") || closingBalanceDebitCreditString.equals("C")) {
+                closingBalanceDebitOrCredit = DebitOrCredit.CREDIT;
+            } else if (closingBalanceDebitCreditString.equals("d") || closingBalanceDebitCreditString.equals("D")) {
+                closingBalanceDebitOrCredit = DebitOrCredit.DEBIT;
+            }
+
+            LocalDate closingBalanceDate = result.getDate("b_date").toLocalDate();
+            String closingBalanceCurrency = result.getString("b_currency");
+            double closingBalanceAmount = result.getDouble("b_amount");
+            BalanceType closingBalanceType = BalanceType.CLOSING;
+
+            Balance closingBalance = new Balance(closingBalanceId, closingBalanceDebitOrCredit, closingBalanceDate, closingBalanceCurrency, closingBalanceAmount, closingBalanceType);
+
+
+
             User lastUpdatedUser = new User(lastUpdatedUserId, email, roleId, userName);
 
             FileDescription fileDescription = new FileDescription(fileDescriptionId, numberOfDebitEntries, numberOfCreditEntries, amountOfDebitEntries, amountOfCreditEntries);
-            BankStatement bankStatement = new BankStatement(id, transActionReferenceNumber, accountNumber, statementNumber, fileDescription, lastUpdatedUser, uploadDate);
+            BankStatement bankStatement = new BankStatement(id, transActionReferenceNumber, accountNumber, statementNumber, fileDescription, lastUpdatedUser, uploadDate, closingBalance);
             allBankStatements.add(bankStatement);
         }
         return allBankStatements;

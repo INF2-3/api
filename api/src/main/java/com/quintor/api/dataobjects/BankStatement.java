@@ -16,7 +16,7 @@ public class BankStatement {
     private Balance closingBalance;
     private Balance openingBalance;
 
-    public BankStatement(int id, String transactionReferenceNumber, String accountNumber, int statementNumber, FileDescription fileDescription, User lastUpdatedUser, LocalDate uploadDate) {
+    public BankStatement(int id, String transactionReferenceNumber, String accountNumber, int statementNumber, FileDescription fileDescription, User lastUpdatedUser, LocalDate uploadDate, Balance closingBalance) {
         setId(id);
         setTransactionReferenceNumber(transactionReferenceNumber);
         setAccountNumber(accountNumber);
@@ -24,6 +24,7 @@ public class BankStatement {
         setFileDescription(fileDescription);
         setLastUpdatedUser(lastUpdatedUser);
         setUploadDate(uploadDate);
+        setClosingBalance(closingBalance);
         this.forwardAvailableBalances = new HashSet<>();
     }
 
