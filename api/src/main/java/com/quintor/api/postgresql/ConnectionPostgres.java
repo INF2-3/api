@@ -13,7 +13,7 @@ import java.util.List;
 public class ConnectionPostgres {
     private static final String url = System.getenv("POSTGRESQL_URL");
     private static final String user = System.getenv("POSTGRESQL_USER");
-    private static final String password = System.getenv("POSTGRESQL_PASSWORD") ;
+    private static final String password = System.getenv("POSTGRESQL_PASSWORD");
 
     /**
      * Creates the connection with a sql query.
@@ -46,35 +46,35 @@ public class ConnectionPostgres {
         ResultSet result = ConnectionPostgres.createConnection(sql);
 
         while (result.next()) {
-            int id = result.getInt("c_id");
-            LocalDate valueDate = result.getDate("value_date").toLocalDate();
-            String entryDate = result.getString("entry_date");
-            String debCred = result.getString("debit_credit");
-            double amount = result.getDouble("amount");
-            String transactionCode = result.getString("transaction_code");
-            String referenceOwner = result.getString("reference_owner");
-            String institutionReference = result.getString("institution_reference");
-            String supplementaryDetails = result.getString("supplementary_details");
-            int originalDescriptionId = result.getInt("original_description_id");
-            String description = result.getString("description");
-            int fileId = result.getInt("file_id");
-            int categoryId = result.getInt("category_id");
+            int id = result.getInt("t_id");
+            LocalDate valueDate = result.getDate("t_value_date").toLocalDate();
+            String entryDate = result.getString("t_entry_date");
+            String debCred = result.getString("t_debit_credit");
+            double amount = result.getDouble("t_amount");
+            String transactionCode = result.getString("t_transaction_code");
+            String referenceOwner = result.getString("t_reference_owner");
+            String institutionReference = result.getString("t_institution_reference");
+            String supplementaryDetails = result.getString("t_supplementary_details");
+            int originalDescriptionId = result.getInt("t_original_description_id");
+            String description = result.getString("t_description");
+            int fileId = result.getInt("t_file_id");
+            int categoryId = result.getInt("t_category_id");
 
-            String categoryName = result.getString("name");
-            String returnReason = result.getString("return_reason");
-            String clientReference = result.getString("client_reference");
-            String endToEndReference = result.getString("end_to_end_reference");
-            String paymentInformationId = result.getString("payment_information_id");
-            String instructionId = result.getString("instruction_id");
-            String mandateReference = result.getString("mandate_reference");
-            String creditorId = result.getString("creditor_id");
-            String counterpartyId = result.getString("counterparty_id");
-            String remittanceInformation = result.getString("remittance_information");
-            String purposeCode = result.getString("purpose_code");
-            String ultimateCreditor = result.getString("ultimate_creditor");
-            String ultimateDebtor = result.getString("ultimate_debtor");
-            String exchangeRate = result.getString("exchange_rate");
-            String charges = result.getString("charges");
+            String categoryName = result.getString("c_name");
+            String returnReason = result.getString("d_return_reason");
+            String clientReference = result.getString("d_client_reference");
+            String endToEndReference = result.getString("d_end_to_end_reference");
+            String paymentInformationId = result.getString("d_payment_information_id");
+            String instructionId = result.getString("d_instruction_id");
+            String mandateReference = result.getString("d_mandate_reference");
+            String creditorId = result.getString("d_creditor_id");
+            String counterpartyId = result.getString("d_counterparty_id");
+            String remittanceInformation = result.getString("d_remittance_information");
+            String purposeCode = result.getString("d_purpose_code");
+            String ultimateCreditor = result.getString("d_ultimate_creditor");
+            String ultimateDebtor = result.getString("d_ultimate_debtor");
+            String exchangeRate = result.getString("d_exchange_rate");
+            String charges = result.getString("d_charges");
 
             Description originalDescription = AddToTransaction.makeDescription(originalDescriptionId, returnReason,
                     clientReference, endToEndReference, paymentInformationId, instructionId, mandateReference, creditorId,
