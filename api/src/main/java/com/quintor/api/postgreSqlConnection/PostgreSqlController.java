@@ -165,7 +165,7 @@ public class PostgreSqlController {
             ResultSet rs = ps.executeQuery();
             while ( rs.next() ) {
                 fileId = Integer.parseInt(rs.getString("f_id"));
-                System.out.println(fileId);
+//                System.out.println(fileId);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -226,10 +226,11 @@ public class PostgreSqlController {
         JSONArray transactions = (JSONArray) tags.get("transactions");
         for(int n = 0; n < transactions.length(); n++) {
             //get descriptionID!!!
+            try {
             JSONObject transaction = (JSONObject) transactions.get(n);
             JSONObject description = (JSONObject) transaction.get("informationToAccountOwner");
             String sqlDescription = "CALL Insert_description( ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar);";
-            PreparedStatement psd = connection.prepareStatement(sqlDescription);
+            PreparedStatement psd = connection.prepareStatement(sqlDescription, Statement.RETURN_GENERATED_KEYS);
             psd.setString(1, (String) description.get("returnReason")); //return_reason
             psd.setString(2, (String) description.get("clientReference")); //client_reference
             psd.setString(3, (String) description.get("endToEndReference")); //end_to_end_reference
@@ -244,11 +245,14 @@ public class PostgreSqlController {
             psd.setString(12, (String) description.get("ultimateDebitor")); //ultimate_debtor
             psd.setString(13, (String) description.get("exchangeRate")); //exchange_rate
             psd.setString(14, (String) description.get("charges")); //charges
-            psd.executeUpdate();
+//            psd.executeUpdate();
 
-//            int descriptionId = psd.getGeneratedKeys().getInt(1);
+            ResultSet rs = psd.executeQuery();
+            int descriptionId = 0;
+            if (rs.next()) {
+                descriptionId = rs.getInt(1);
+            }
 
-            try{
                 String sqlTransaction = "CALL Insert_Transaction(?::date, ?::varchar, ?::char, ?::numeric, ?::varchar, ?::int, ?::int, ?::int, ?::varchar, ?::varchar, ?::varchar, ?::varchar)";
                 PreparedStatement ps = connection.prepareStatement(sqlTransaction);
                 ps.setString(1, (String) transaction.get("valueDate"));
@@ -256,7 +260,7 @@ public class PostgreSqlController {
                 ps.setString(3, (String) transaction.get("debitCreditMark"));
                 ps.setString(4, (String) transaction.get("amount"));
                 ps.setString(5, (String) transaction.get("identificationCode"));
-                ps.setInt(6, 1);                       //original_description_ID
+                ps.setInt(6, descriptionId);                       //original_description_ID
                 ps.setInt(7, fileId);
                 ps.setInt(8, 1);
                 if (transaction.has("referenceForTheAccountOwner")) {
