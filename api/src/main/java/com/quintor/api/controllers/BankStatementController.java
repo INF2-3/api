@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/bankStatement/")
 public class BankStatementController {
-    @GetMapping("allBankStatements")
-    public String allBankStatements(){
-        try ToJSON.bankStatementsToJson();
-    }
+//    @GetMapping("allBankStatements")
+//    public String allBankStatements(){
+//        try ToJSON.bankStatementsToJson();
+//    }
 }

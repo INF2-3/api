@@ -87,7 +87,7 @@ public class BankStatement {
         return this.forwardAvailableBalances;
     }
 
-    public void addForwardAvailableBalance(Balance forwardAvailableBalance){
+    public void addForwardAvailableBalance(Balance forwardAvailableBalance) {
         this.forwardAvailableBalances.add(forwardAvailableBalance);
     }
 
