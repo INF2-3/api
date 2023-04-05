@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class Transaction {
     private int id;
     private LocalDate valueDate;
-    private int entryDate;
+    private String entryDate;
     private DebitOrCredit debitOrCredit;
     private double amount;
     private String transactionCode;
@@ -17,7 +17,7 @@ public class Transaction {
     private int fileId;
     private Category category;
 
-    public Transaction(int id, LocalDate valueDate, int entryDate, DebitOrCredit debitOrCredit, double amount, String transactionCode, Description originalDescription, int fileId, Category category) {
+    public Transaction(int id, LocalDate valueDate, String entryDate, DebitOrCredit debitOrCredit, double amount, String transactionCode, Description originalDescription, int fileId, Category category) {
         setId(id);
         setValueDate(valueDate);
         setEntryDate(entryDate);
@@ -45,11 +45,11 @@ public class Transaction {
         this.valueDate = valueDate;
     }
 
-    public int getEntryDate() {
+    public String getEntryDate() {
         return this.entryDate;
     }
 
-    public void setEntryDate(int entryDate) {
+    public void setEntryDate(String entryDate) {
         this.entryDate = entryDate;
     }
 
