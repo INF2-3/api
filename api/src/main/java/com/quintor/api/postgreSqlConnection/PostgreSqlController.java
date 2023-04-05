@@ -1,18 +1,27 @@
 package com.quintor.api.postgreSqlConnection;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
+import com.quintor.api.validators.JSONSchemaValidator;
+import com.quintor.api.validators.SchemaValidator;
+//import net.minidev.json.JSONArray;
+//import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
+//import net.minidev.json.parser.ParseException;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/postgres")
@@ -25,7 +34,7 @@ public class PostgreSqlController {
      * It calls the function insertInPostgres(json) if json is not null
      * */
     @PostMapping("/insert")
-    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, ParseException {
+    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException {
 
         if (file == null) {
             return "no_file";
@@ -34,9 +43,8 @@ public class PostgreSqlController {
             return "wrong_user_id";
         }
         String jsonString = parser(file);
-
-        JSONParser parser = new JSONParser();
-        JSONObject json = (JSONObject) parser.parse(jsonString);
+//        JSONParser parser = new JSONParser();
+        JSONObject json = new JSONObject(jsonString);
         // Step 1: Establishing a Connection
         try (Connection connection = DriverManager.getConnection(url, user, password)){
              // Step 2:Create a statement using connection object
@@ -59,39 +67,12 @@ public class PostgreSqlController {
     * and returns String gotten from parser wht getResponse()
     */
     private String parser(File file) throws IOException {
-        String url = "http://localhost:9091" + "/MT940toJSON";
-        URL api = new URL(url);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) api.openConnection();
-
-        httpURLConnection.setRequestMethod("POST");
-        httpURLConnection.setRequestProperty("Accept", "application/json");
-        httpURLConnection.setDoOutput(true);
-        OutputStream os = httpURLConnection.getOutputStream();
-        String params = "file=" + file;
-        os.write(params.getBytes());
-        os.flush();
-        os.close();
-
-        int responseCode = httpURLConnection.getResponseCode();
-        System.out.println("POST Response Code :: " + responseCode);
-
-        if (responseCode == HttpURLConnection.HTTP_OK) { // success
-            BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            String inputLine;
-            StringBuffer sb = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            String response2 = sb.toString();
-            in.close();
-            return response2;
-        } else {
-            System.out.println("POST request not worked");
-        }
-
-
-        return null;
+        InputStream stream = new FileInputStream(file);
+        MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
+        SchemaValidator schemaValidator = new JSONSchemaValidator();
+        String result = schemaValidator.validateFormat(multipartFile, "bankStatementSchema");
+        System.out.println(result);
+        return result;
     }
 
     /*
@@ -106,8 +87,8 @@ public class PostgreSqlController {
             while((line = br.readLine()) != null){
                 sb.append(line);
             }
-            JSONObject json = new JSONObject();
-            json.writeJSONString(sb);
+            JSONObject json = new JSONObject(sb);
+//            json.writeJSONString(sb);
             return json;
         } else {
             br = new BufferedReader(new InputStreamReader(httpURLConnection.getErrorStream()));
@@ -115,8 +96,8 @@ public class PostgreSqlController {
             while((line = br.readLine()) != null){
                 sb.append(line);
             }
-            JSONObject json = new JSONObject();
-            json.writeJSONString(sb);
+            JSONObject json = new JSONObject(sb);
+//            json.writeJSONString(sb);
             return json;
         }
     }
@@ -145,20 +126,19 @@ public class PostgreSqlController {
         }
 
         //file
-        String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date, ?::varchar)";
+        String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
         JSONObject accountIdentification = (JSONObject) tags.get("accountIdentification");
         JSONObject transactionReferenceNumber = (JSONObject) tags.get("transactionReferenceNumber");
         JSONObject statementNumber = (JSONObject) tags.get("statementNumber");
 
         //get FILE_DESCRIPTION_ID
-        String sqlFileDescriptionId = "SELECT id FROM file_description ORDER BY id DESC LIMIT 1";
+        String sqlFileDescriptionId = "SELECT f_d_id FROM file_description ORDER BY f_d_id DESC LIMIT 1";
         int fileDescriptionId = 0;
         try{
             PreparedStatement ps = connection.prepareStatement(sqlFileDescriptionId);
             ResultSet rs = ps.executeQuery();
             while ( rs.next() ) {
-                fileDescriptionId = Integer.parseInt(rs.getString("id"));
-                System.out.println(fileDescriptionId);
+                fileDescriptionId = Integer.parseInt(rs.getString("f_d_id"));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -172,20 +152,19 @@ public class PostgreSqlController {
             ps.setInt(4, fileDescriptionId);
             ps.setInt(5, 1);
             ps.setString(6, "2300-10-23");
-            ps.setString(7, "What?");
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         //get FILE_ID
-        String sqlFileId = "SELECT id FROM file ORDER BY id DESC LIMIT 1";
+        String sqlFileId = "SELECT f_id FROM file ORDER BY f_id DESC LIMIT 1";
         int fileId = 0;
         try{
             PreparedStatement ps = connection.prepareStatement(sqlFileId);
             ResultSet rs = ps.executeQuery();
             while ( rs.next() ) {
-                fileId = Integer.parseInt(rs.getString("id"));
+                fileId = Integer.parseInt(rs.getString("f_id"));
                 System.out.println(fileId);
             }
         } catch (SQLException e) {
@@ -226,7 +205,7 @@ public class PostgreSqlController {
         JSONArray forwardAvailableBalances = (JSONArray) tags.get("forwardAvailableBalance");
 
 
-        for(int n = 0; n <forwardAvailableBalances.size(); n++){
+        for(int n = 0; n <forwardAvailableBalances.length(); n++){
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
             JSONObject forwardAvailableBalance = (JSONObject) forwardAvailableBalances.get(n);
             try{
@@ -245,45 +224,52 @@ public class PostgreSqlController {
 
         //transactions
         JSONArray transactions = (JSONArray) tags.get("transactions");
-        for(int n = 0; n < transactions.size(); n++) {
+        for(int n = 0; n < transactions.length(); n++) {
             //get descriptionID!!!
             JSONObject transaction = (JSONObject) transactions.get(n);
             JSONObject description = (JSONObject) transaction.get("informationToAccountOwner");
+            String sqlDescription = "CALL Insert_description( ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar);";
+            PreparedStatement psd = connection.prepareStatement(sqlDescription);
+            psd.setString(1, (String) description.get("returnReason")); //return_reason
+            psd.setString(2, (String) description.get("clientReference")); //client_reference
+            psd.setString(3, (String) description.get("endToEndReference")); //end_to_end_reference
+            psd.setString(4, (String) description.get("paymentInformationId")); //payment_information_id
+            psd.setString(5, (String) description.get("instructionId")); //instruction_id
+            psd.setString(6, (String) description.get("mandateReference")); //mandate_reference
+            psd.setString(7, (String) description.get("creditorId")); //creditor_id
+            psd.setString(8, (String) description.get("counterPartyId")); //counterparty_id
+            psd.setString(9, (String) description.get("remittanceInformation")); //remittance_information
+            psd.setString(10, (String) description.get("purposeCode")); //purpose_code
+            psd.setString(11, (String) description.get("ultimateCreditor")); //ultimate_creditor
+            psd.setString(12, (String) description.get("ultimateDebitor")); //ultimate_debtor
+            psd.setString(13, (String) description.get("exchangeRate")); //exchange_rate
+            psd.setString(14, (String) description.get("charges")); //charges
+            psd.executeUpdate();
+
             try{
-                String sqlTransaction = "CALL Insert_Transaction(?::date, ?::int, ?::char, ?::money, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::int, ?::varchar, ?::int, ?::int)";
+                String sqlTransaction = "CALL Insert_Transaction(?::date, ?::varchar, ?::char, ?::money, ?::varchar, ?::int, ?::int, ?::int, ?::varchar, ?::varchar, ?::varchar, ?::varchar)";
                 PreparedStatement ps = connection.prepareStatement(sqlTransaction);
                 ps.setString(1, (String) transaction.get("valueDate"));
                 ps.setString(2, (String) transaction.get("entryDate"));
                 ps.setString(3, (String) transaction.get("debitCreditMark"));
                 ps.setString(4, (String) transaction.get("amount"));
                 ps.setString(5, (String) transaction.get("identificationCode"));
-                ps.setString(6, (String) transaction.get("referenceForTheAccountOwner"));
-                ps.setString(7, (String) transaction.get("referenceOfTheAccountServicingInstitution"));
-                ps.setString(8, (String) transaction.get("supplementaryDetails"));
-                ps.setInt(9,2);                       //original_description_ID
-                ps.setString(10, "This is a description");                  //description
-                ps.setInt(11, fileId); //catagoryID
-                ps.setInt(12, 1); //catagoryID
+                ps.setInt(6,1);                       //original_description_ID
+                ps.setInt(7, fileId);
+                ps.setInt(8, 1);
+                if (transaction.has("referenceForTheAccountOwner")) {
+                    ps.setString(9, (String) transaction.get("referenceForTheAccountOwner"));
+                }
+                if (transaction.has("referenceOfTheAccountServicingInstitution")) {
+                    ps.setString(10, (String) transaction.get("referenceOfTheAccountServicingInstitution"));
+                }
+                if(transaction.has("supplementaryDetails")) {
+                    ps.setString(11, (String) transaction.get("supplementaryDetails"));
+                } else {
+                    ps.setString(11, "");
+                }
+                ps.setString(12, "");                  //description
                 ps.executeUpdate();
-
-                //Description transaction ID as foreinkey might need to be added
-                String sqlDescription = "CALL Insert_description( ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar);";
-                PreparedStatement psd = connection.prepareStatement(sqlDescription);
-                psd.setString(1, (String) description.get("returnReason")); //return_reason
-                psd.setString(2, (String) description.get("clientReference")); //client_reference
-                psd.setString(3, (String) description.get("endToEndReference")); //end_to_end_reference
-                psd.setString(4, (String) description.get("paymentInformationId")); //payment_information_id
-                psd.setString(5, (String) description.get("instructionId")); //instruction_id
-                psd.setString(6, (String) description.get("mandateReference")); //mandate_reference
-                psd.setString(7, (String) description.get("creditorId")); //creditor_id
-                psd.setString(8, (String) description.get("counterPartyId")); //counterparty_id
-                psd.setString(9, (String) description.get("remittanceInformation")); //remittance_information
-                psd.setString(10, (String) description.get("purposeCode")); //purpose_code
-                psd.setString(11, (String) description.get("ultimateCreditor")); //ultimate_creditor
-                psd.setString(12, (String) description.get("ultimateDebitor")); //ultimate_debtor
-                psd.setString(13, (String) description.get("exchangeRate")); //exchange_rate
-                psd.setString(14, (String) description.get("charges")); //charges
-                psd.executeUpdate();
 
             } catch (SQLException e) {
             throw new RuntimeException(e);

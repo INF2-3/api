@@ -16,7 +16,7 @@ public abstract class SchemaValidator {
         this.validatorType = validatorType;
     }
 
-    public abstract String compareToSchema(StringBuffer input, String schemaName) throws SAXException, IOException;
+    public abstract String compareToSchema(String input, String schemaName) throws SAXException, IOException;
 
     /**
      * First stores the output from the parser in a StringBuffer and calls the compareToSchema method to validate it
@@ -26,7 +26,7 @@ public abstract class SchemaValidator {
      */
     public String validateFormat(MultipartFile file, String schemaName) {
         try {
-            StringBuffer input = requestInputFromParser(file);
+            String input = requestInputFromParser(file);
             return compareToSchema(input, schemaName);
         } catch (SAXException | IOException e) {
             return e.getMessage();
@@ -40,7 +40,7 @@ public abstract class SchemaValidator {
      * @param file MT940 file
      * @return StringBuffer containing xml or json
      */
-    public StringBuffer requestInputFromParser(MultipartFile file) throws IOException {
+    public String requestInputFromParser(MultipartFile file) throws IOException {
         String url = System.getenv("URL") + "/MT940to" + validatorType.toUpperCase();
         URL api = new URL(url);
 
@@ -80,7 +80,7 @@ public abstract class SchemaValidator {
                 response.append(inputLine);
             }
             in.close();
-            return response;
+            return response.toString();
         }
         return null;
     }

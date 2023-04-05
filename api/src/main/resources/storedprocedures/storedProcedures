@@ -1,17 +1,17 @@
 Create or Replace Procedure Insert_Transaction
 (IN
    c_value_date date,
-   c_entry_date int,
+   c_entry_date varchar,
    c_debit_credit char,
    c_amount money,
    c_transaction_code varchar,
-   c_reference_owner varchar,
-   c_institution_reference varchar,
-   c_supplementary_details varchar,
    c_original_description_id int,
-   c_description varchar,
    c_file_id int,
-   c_category_id int
+   c_category_id int,
+   c_reference_owner varchar DEFAULT NULL,
+   c_institution_reference varchar DEFAULT NULL,
+   c_supplementary_details varchar DEFAULT NULL,
+   c_description varchar DEFAULT NULL
 )
 
 LANGUAGE plpgsql
@@ -25,13 +25,13 @@ Begin
    debit_credit,
    amount,
    transaction_code,
+   original_description_id,
+   file_id,
+   category_id,
    reference_owner,
    institution_reference,
    supplementary_details,
-   original_description_id,
-   description,
-   file_id,
-   category_id
+   description
 )
    Values
  (
@@ -41,13 +41,13 @@ Begin
    c_debit_credit,
    c_amount,
    c_transaction_code,
+   c_original_description_id,
+   c_file_id,
+   c_category_id,
    c_reference_owner,
    c_institution_reference,
    c_supplementary_details,
-   c_original_description_id,
-   c_description,
-   c_file_id,
-   c_category_id
+   c_description
 );
 END;
 $$;
@@ -125,20 +125,20 @@ CALL Insert_balance
 
 Create or Replace Procedure Insert_Description
 (IN
-   c_return_reason varchar,
-   c_client_reference varchar,
-   c_end_to_end_reference varchar,
-   c_payment_information_id varchar,
-   c_instruction_id varchar,
-   c_mandate_reference varchar,
-   c_creditor_id varchar,
-   c_counterparty_id varchar,
-   c_remittance_information varchar,
-   c_purpose_code varchar,
-   c_ultimate_creditor varchar,
-   c_ultimate_debtor varchar,
-   c_exchange_rate varchar,
-   c_charges varchar
+   c_return_reason varchar DEFAULT NULL,
+   c_client_reference varchar DEFAULT NULL,
+   c_end_to_end_reference varchar DEFAULT NULL,
+   c_payment_information_id varchar DEFAULT NULL,
+   c_instruction_id varchar DEFAULT NULL,
+   c_mandate_reference varchar DEFAULT NULL,
+   c_creditor_id varchar DEFAULT NULL,
+   c_counterparty_id varchar DEFAULT NULL,
+   c_remittance_information varchar DEFAULT NULL,
+   c_purpose_code varchar DEFAULT NULL,
+   c_ultimate_creditor varchar DEFAULT NULL,
+   c_ultimate_debtor varchar DEFAULT NULL,
+   c_exchange_rate varchar DEFAULT NULL,
+   c_charges varchar DEFAULT NULL
 )
 
 LANGUAGE plpgsql
@@ -210,8 +210,7 @@ Create or Replace Procedure insert_file
    c_statement_number int,
    c_file_description_id int,
    c_last_updated_user int,
-   c_upload_date date,
-   c_filecol varchar
+   c_upload_date date
 )
 
 LANGUAGE plpgsql
@@ -225,8 +224,7 @@ Begin
    statement_number,
    file_description_id,
    last_updated_user,
-   upload_date,
-   filecol
+   upload_date
 )
    Values
  (
@@ -236,8 +234,7 @@ Begin
    c_statement_number,
    c_file_description_id,
    c_last_updated_user,
-   c_upload_date,
-   c_filecol
+   c_upload_date
 );
 END;
 $$;

@@ -22,10 +22,9 @@ public class JSONSchemaValidator extends SchemaValidator {
      *
      * @param input StringBuffer containing json that needs to be validated
      * @return returns "Validated" if there were no errors, otherwise returns the error
-     * @throws IOException
      */
     @Override
-    public String compareToSchema(StringBuffer input, String schemaName) throws IOException {
+    public String compareToSchema(String input, String schemaName) throws IOException {
         InputStream schemaStream = JSONSchemaValidator.class.getClassLoader().getResourceAsStream("schemas/json/" + schemaName + ".json");
         JsonSchema jsonSchema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(schemaStream);
 
@@ -39,8 +38,8 @@ public class JSONSchemaValidator extends SchemaValidator {
         }
 
         if (errorsCombined.equals("")) {
-            return "Validated";
+            return input;
         }
-        return errorsCombined;
+        throw new IOException(errorsCombined);
     }
 }
