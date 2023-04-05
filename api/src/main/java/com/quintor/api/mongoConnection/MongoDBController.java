@@ -1,5 +1,7 @@
 package com.quintor.api.mongoConnection;
 
+import com.quintor.api.mt940.Mt940;
+import com.quintor.api.mt940.Mt940Service;
 import com.quintor.api.validators.JSONSchemaValidator;
 import com.quintor.api.validators.SchemaValidator;
 import com.quintor.api.validators.XMLSchemaValidator;
@@ -16,10 +18,10 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("api/mt940")
-public class Mt940Controller {
+public class MongoDBController {
     private final Mt940Service mt940Service;
 
-    public Mt940Controller(Mt940Service mt940Service) {
+    public MongoDBController(Mt940Service mt940Service) {
         this.mt940Service = mt940Service;
     }
 
