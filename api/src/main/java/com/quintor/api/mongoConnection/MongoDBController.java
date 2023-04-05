@@ -1,5 +1,7 @@
 package com.quintor.api.mongoConnection;
 
+import com.quintor.api.mt940.Mt940;
+import com.quintor.api.mt940.Mt940Service;
 import com.quintor.api.validators.JSONSchemaValidator;
 import com.quintor.api.validators.SchemaValidator;
 import com.quintor.api.validators.XMLSchemaValidator;
