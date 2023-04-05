@@ -24,6 +24,7 @@ public class BankStatement {
         this.fileDescription = fileDescription;
         this.lastUpdatedUser = lastUpdatedUser;
         this.uploadDate = uploadDate;
+        this.forwardAvailableBalances = new HashSet<>();
     }
 
     public int getId() {
