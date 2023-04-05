@@ -9,14 +9,14 @@ public class BankStatement {
     private String accountNumber;
     private int statementNumber;
     private FileDescription fileDescription;
-    private int lastUpdatedUser;
+    private User lastUpdatedUser;
     private LocalDate uploadDate;
     private HashSet<Balance> forwardAvailableBalances;
     private Balance closingAvailableBalance;
     private Balance closingBalance;
     private Balance openingBalance;
 
-    public BankStatement(int id, String transactionReferenceNumber, String accountNumber, int statementNumber, FileDescription fileDescription, int lastUpdatedUser, LocalDate uploadDate) {
+    public BankStatement(int id, String transactionReferenceNumber, String accountNumber, int statementNumber, FileDescription fileDescription, User lastUpdatedUser, LocalDate uploadDate) {
         setId(id);
         setTransactionReferenceNumber(transactionReferenceNumber);
         setAccountNumber(accountNumber);
@@ -67,11 +67,11 @@ public class BankStatement {
         this.fileDescription = fileDescription;
     }
 
-    public int getLastUpdatedUser() {
+    public User getLastUpdatedUser() {
         return this.lastUpdatedUser;
     }
 
-    public void setLastUpdatedUser(int lastUpdatedUser) {
+    public void setLastUpdatedUser(User lastUpdatedUser) {
         this.lastUpdatedUser = lastUpdatedUser;
     }
 

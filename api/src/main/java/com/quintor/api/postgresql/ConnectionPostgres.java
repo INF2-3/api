@@ -103,11 +103,16 @@ public class ConnectionPostgres {
             int statementNumber = result.getInt("f_statement_number");
             int fileDescriptionId = result.getInt("f_file_description_id");
             LocalDate uploadDate = result.getDate("f_upload_date").toLocalDate();
-            int lastUpdatedUser = result.getInt("f_last_updated_user");
+            int lastUpdatedUserId = result.getInt("f_last_updated_user");
             int numberOfDebitEntries = result.getInt("f_d_number_of_debit_entries");
             int numberOfCreditEntries = result.getInt("f_d_number_of_credit_entries");
             double amountOfDebitEntries = result.getDouble("f_d_amount_of_debit_entries");
             double amountOfCreditEntries = result.getDouble("f_d_amount_of_credit_entries");
+            String email = result.getString("u_email");
+            String userName = result.getString("u_username");
+            int roleId = result.getInt("u_role_id");
+
+            User lastUpdatedUser = new User(lastUpdatedUserId, email, roleId, userName);
 
             FileDescription fileDescription = new FileDescription(fileDescriptionId, numberOfDebitEntries, numberOfCreditEntries, amountOfDebitEntries, amountOfCreditEntries);
             BankStatement bankStatement = new BankStatement(id, transActionReferenceNumber, accountNumber, statementNumber, fileDescription, lastUpdatedUser, uploadDate);
