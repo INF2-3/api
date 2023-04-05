@@ -1,7 +1,6 @@
 package com.quintor.api.postgresql;
 
 import com.quintor.api.dataobjects.*;
-import org.json.JSONArray;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -90,6 +89,14 @@ public class ConnectionPostgres {
         return allTransactions;
     }
 
+    /**
+     * Get all the bankStatements from the database with a view.
+     * Loops over all the results and makes the bankStatement, ClosingBalance, LastUpdatedUser and FileDescription
+     * Then adds the bankStatement to the list with all the BankStatements.
+     *
+     * @return a list with BankStatements/
+     * @throws SQLException can throw SQLException
+     */
     public static List<BankStatement> getAllBankStatements() throws SQLException {
         List<BankStatement> allBankStatements = new ArrayList<>();
 
@@ -127,7 +134,6 @@ public class ConnectionPostgres {
             BalanceType closingBalanceType = BalanceType.CLOSING;
 
             Balance closingBalance = new Balance(closingBalanceId, closingBalanceDebitOrCredit, closingBalanceDate, closingBalanceCurrency, closingBalanceAmount, closingBalanceType);
-
 
 
             User lastUpdatedUser = new User(lastUpdatedUserId, email, roleId, userName);

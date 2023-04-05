@@ -14,6 +14,11 @@ import java.util.List;
 @RestController
 @RequestMapping("api/bankStatement/")
 public class BankStatementController {
+    /**
+     * This method can be called when you want all the bankStatements from the postgresql database in JSON format
+     *
+     * @return a JSON string with all the bankStatements
+     */
     @GetMapping("allBankStatementsJSON")
     public String allBankStatementsJSON() {
         try {
@@ -23,6 +28,11 @@ public class BankStatementController {
         }
     }
 
+    /**
+     * This method can be called when you want all the bankStatements from the postgresql database in XML format
+     *
+     * @return a xml String with all the BankStatements.
+     */
     @GetMapping("allBankStatementsXML")
     public String allBankStatementsXML() {
         try {

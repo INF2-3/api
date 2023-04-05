@@ -24,6 +24,12 @@ public class ToXML {
         return xStream.toXML(allTransactions);
     }
 
+    /**
+     * Puts the list of BankStatements in an XML String.
+     *
+     * @param allBankStatements the list of BankStatements you want to change to XML.
+     * @return a String of XML.
+     */
     public static String bankStatementsToXML(List<BankStatement> allBankStatements) {
         XStream xStream = new XStream();
         xStream.alias("bankStatement", BankStatement.class);
