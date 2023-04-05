@@ -89,7 +89,8 @@ public class ConnectionPostgres {
 
             allTransactions.add(transaction);
         }
-        JSONArray jsonArray = new JSONArray(allTransactions);
         return allTransactions;
     }
+
+
 }

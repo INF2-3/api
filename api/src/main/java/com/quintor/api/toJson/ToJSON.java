@@ -1,5 +1,6 @@
 package com.quintor.api.toJson;
 
+import com.quintor.api.dataobjects.BankStatement;
 import com.quintor.api.dataobjects.Transaction;
 import org.json.JSONArray;
 
@@ -14,5 +15,9 @@ public class ToJSON {
      */
     public static JSONArray transactionsToJson(List<Transaction> allTransactions) {
         return new JSONArray(allTransactions);
+    }
+
+    public static JSONArray bankStatementsToJson(List<BankStatement> allBankStatements){
+        return new JSONArray(allBankStatements);
     }
 }
