@@ -112,7 +112,7 @@ public class PostgreSqlController {
         JSONObject tags = (JSONObject) json.get("tags");
 
         //file_description
-        String sqlFileDescription = "CALL insert_file_description(?::int, ?::int, ?::money, ?::money);";
+        String sqlFileDescription = "CALL insert_file_description(?::int, ?::int, ?::numeric, ?::numeric);";
         JSONObject fileDescription = (JSONObject) tags.get("generalInformationToAccountOwner");
         try{
             PreparedStatement ps = connection.prepareStatement(sqlFileDescription);
@@ -174,7 +174,7 @@ public class PostgreSqlController {
 
 
         //balance
-        String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::money, ?::varchar,  ?::int);";
+        String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::numeric, ?::varchar,  ?::int);";
         JSONObject closingAvailableBalance = (JSONObject) tags.get("closingAvailableBalance");
         try{
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
@@ -246,15 +246,17 @@ public class PostgreSqlController {
             psd.setString(14, (String) description.get("charges")); //charges
             psd.executeUpdate();
 
+//            int descriptionId = psd.getGeneratedKeys().getInt(1);
+
             try{
-                String sqlTransaction = "CALL Insert_Transaction(?::date, ?::varchar, ?::char, ?::money, ?::varchar, ?::int, ?::int, ?::int, ?::varchar, ?::varchar, ?::varchar, ?::varchar)";
+                String sqlTransaction = "CALL Insert_Transaction(?::date, ?::varchar, ?::char, ?::numeric, ?::varchar, ?::int, ?::int, ?::int, ?::varchar, ?::varchar, ?::varchar, ?::varchar)";
                 PreparedStatement ps = connection.prepareStatement(sqlTransaction);
                 ps.setString(1, (String) transaction.get("valueDate"));
                 ps.setString(2, (String) transaction.get("entryDate"));
                 ps.setString(3, (String) transaction.get("debitCreditMark"));
                 ps.setString(4, (String) transaction.get("amount"));
                 ps.setString(5, (String) transaction.get("identificationCode"));
-                ps.setInt(6,1);                       //original_description_ID
+                ps.setInt(6, 1);                       //original_description_ID
                 ps.setInt(7, fileId);
                 ps.setInt(8, 1);
                 if (transaction.has("referenceForTheAccountOwner")) {

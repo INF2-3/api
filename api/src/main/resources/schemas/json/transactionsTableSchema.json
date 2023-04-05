@@ -32,7 +32,7 @@
           },
           "amount": {
             "type": "string",
-            "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+            "pattern": "^(0|[1-9]\\d*)(.\\d+)?$",
             "description": "This pattern checks if amount is a number greater than or equal to 0"
           },
           "entryDate": {
