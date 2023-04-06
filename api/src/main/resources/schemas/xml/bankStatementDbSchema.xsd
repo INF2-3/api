@@ -15,8 +15,8 @@
                     <xs:element type="xs:int" name="id"/>
                     <xs:element type="xs:integer" name="numberOfDebitEntries"/>
                     <xs:element type="xs:integer" name="numberOfCreditEntries"/>
-                    <xs:element type="xs:integer" name="amountOfDebitEntries"/>
-                    <xs:element type="xs:integer" name="amountOfCreditEntries"/>
+                    <xs:element type="xs:double" name="amountOfDebitEntries"/>
+                    <xs:element type="xs:double" name="amountOfCreditEntries"/>
                   </xs:all>
                 </xs:complexType>
               </xs:element>

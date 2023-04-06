@@ -30,10 +30,10 @@ public class BankStatementController {
     public ResponseEntity<String> allBankStatementsJSON() {
         try {
             String allBankStatements = ToJSON.bankStatementsToJson(ConnectionPostgres.getAllBankStatements()).toString();
-            SchemaValidator validator = new JSONSchemaValidator();
+            JSONSchemaValidator validator = new JSONSchemaValidator();
             return ResponseEntity.status(HttpStatus.OK)
                     .body(validator.compareToSchema(allBankStatements, "bankStatementDbSchema"));
-        } catch (SQLException | SAXException | IOException e) {
+        } catch (SQLException | IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -47,10 +47,10 @@ public class BankStatementController {
     public ResponseEntity<String> allBankStatementsXML() {
         try {
             String allBankStatements = ToXML.bankStatementsToXML(ConnectionPostgres.getAllBankStatements());
-            SchemaValidator validator = new XMLSchemaValidator();
+            XMLSchemaValidator validator = new XMLSchemaValidator();
             System.out.println(allBankStatements);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(validator.compareToSchema(allBankStatements, "bankStatementSchema"));
+                    .body(validator.compareToSchema(allBankStatements, "bankStatementDbSchema"));
         } catch (SQLException | SAXException | IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
