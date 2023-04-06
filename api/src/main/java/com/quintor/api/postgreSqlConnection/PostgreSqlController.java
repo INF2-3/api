@@ -2,6 +2,7 @@ package com.quintor.api.postgreSqlConnection;
 
 import com.quintor.api.validators.JSONSchemaValidator;
 import com.quintor.api.validators.SchemaValidator;
+import com.quintor.api.validators.XMLSchemaValidator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -11,9 +12,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.sql.*;
 
 @RestController
@@ -27,7 +35,7 @@ public class PostgreSqlController {
      * It calls the function insertInPostgres(json) if json is not null
      * */
     @PostMapping("/insert")
-    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException {
+    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, ParserConfigurationException, SAXException {
 
         if (file == null) {
             return "no_file";
@@ -36,14 +44,20 @@ public class PostgreSqlController {
             return "wrong_user_id";
         }
 
-        String jsonString = parser(file);
-        JSONObject json = new JSONObject(jsonString);
+        //String jsonString = parserJSON(file);
+        //JSONObject json = new JSONObject(jsonString);
+
+        String xmlString = parserXML(file);
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        Document xml = documentBuilder.parse(new InputSource(new StringReader(xmlString)));
+
 
         // Step 1: Establishing a Connection
         try (Connection connection = DriverManager.getConnection(url, user, password)){
              // Step 2:Create a statement using connection object
-            insertInPostgres(json);
-
+            //insertInPostgresJSON(json);
+                insertInPostgresXML(xml);
             // Step 3: Execute the query or update query
         }catch (SQLException e) {
 
@@ -55,11 +69,12 @@ public class PostgreSqlController {
         return "done";
     }
 
+
     /*
     * sets up connection with parser
     * and returns String gotten from parser wht getResponse()
     */
-    private String parser(File file) throws IOException {
+    private String parserJSON(File file) throws IOException {
         InputStream stream = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
         SchemaValidator schemaValidator = new JSONSchemaValidator();
@@ -68,31 +83,143 @@ public class PostgreSqlController {
     }
 
     /*
-    * gets response from endpoint in bufferedReader and into string
-    */
-    private JSONObject getResponse(HttpURLConnection httpURLConnection) throws IOException {
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-        if (100 <= httpURLConnection.getResponseCode() && httpURLConnection.getResponseCode() <= 399) {
-            br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            String line;
-            while((line = br.readLine()) != null){
-                sb.append(line);
-            }
-            JSONObject json = new JSONObject(sb);
-//            json.writeJSONString(sb);
-            return json;
-        } else {
-            br = new BufferedReader(new InputStreamReader(httpURLConnection.getErrorStream()));
-            String line;
-            while((line = br.readLine()) != null){
-                sb.append(line);
-            }
-            JSONObject json = new JSONObject(sb);
-//            json.writeJSONString(sb);
-            return json;
+     * sets up connection with parser
+     * and returns String gotten from parser wht getResponse()
+     */
+    private String parserXML(File file) throws IOException {
+        InputStream stream = new FileInputStream(file);
+        MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
+        SchemaValidator schemaValidator = new XMLSchemaValidator();
+        String result = schemaValidator.validateFormat(multipartFile, "bankStatementSchema");
+        return result;
+    }
+
+
+    /*
+     * gets tags from the json and inserts it into postgresql
+     * with stored procedures. does table after table
+     */
+    private void insertInPostgresJSON(JSONObject json) throws SQLException {
+        Connection connection = DriverManager.getConnection(url, user, password);
+        //get tag for the table
+        JSONObject tags = (JSONObject) json.get("tags");
+
+        insertIntoFileDescriptionJSON(connection, tags);
+        insertIntoFileJSON(connection, tags);
+        insertIntoBalanceJSON(connection, tags);
+        insertIntoTransactionJSON(connection, tags);
+    }
+
+    private void insertInPostgresXML(Document xml) throws SQLException {
+        Connection connection = DriverManager.getConnection(url, user, password);
+        //get tags values
+        NodeList nodeList = xml.getElementsByTagName("tags");
+        Element tags = (Element) nodeList.item(0);
+
+        insertIntoFileDescriptionXML(connection, tags);
+        insertIntoFileXML(connection, tags);
+        insertIntoBalanceXML(connection, tags);
+
+    }
+
+    private void insertIntoFileDescriptionXML(Connection connection, Element tags){
+        String sqlFileDescription = "CALL insert_file_description(?::int, ?::int, ?::numeric, ?::numeric);";
+        NodeList tag = tags.getElementsByTagName("generalInformationToAccountOwner");
+        Element fileDescription = (Element) tag.item(0);
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlFileDescription);
+            ps.setString(1, fileDescription.getElementsByTagName("numberOfDebitEntries").item(0).getTextContent());
+            ps.setString(2, fileDescription.getElementsByTagName("numberOfCreditEntries").item(0).getTextContent());
+            ps.setString(3, fileDescription.getElementsByTagName("debitEntriesTotalAmount").item(0).getTextContent());
+            ps.setString(4, fileDescription.getElementsByTagName("creditEntriesTotalAmount").item(0).getTextContent());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void insertIntoFileXML(Connection connection, Element tags){
+        String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
+
+        NodeList accountIdentificationTag = tags.getElementsByTagName("accountIdentification");
+        Element accountIdentification = (Element) accountIdentificationTag.item(0);
+        NodeList transactionReferenceNumberTag = tags.getElementsByTagName("transactionReferenceNumber");
+        Element transactionReferenceNumber = (Element) transactionReferenceNumberTag.item(0);
+        NodeList statementNumberTag = tags.getElementsByTagName("statementNumber");
+        Element statementNumber = (Element) statementNumberTag.item(0);
+
+        int fileDescriptionId = getFileDescriptionId(connection);
+
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlFile);
+            ps.setString(1, transactionReferenceNumber.getElementsByTagName("referenceNumber").item(0).getTextContent());
+            ps.setString(2, accountIdentification.getElementsByTagName("accountNumber").item(0).getTextContent());
+            ps.setString(3, statementNumber.getElementsByTagName("statementNumber").item(0).getTextContent());
+            ps.setInt(4, fileDescriptionId);
+            ps.setInt(5, 1);
+            ps.setString(6, "2300-10-23");
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
+    private void insertIntoBalanceXML(Connection connection, Element tags) throws SQLException {
+        int fileId = getFileId(connection);
+        //balance
+        String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::numeric, ?::varchar,  ?::int);";
+        NodeList closingAvailableBalanceTag = tags.getElementsByTagName("closingAvailableBalance");
+        Element closingAvailableBalance = (Element) closingAvailableBalanceTag.item(0);
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlBalance);
+            ps.setString(1, closingAvailableBalance.getElementsByTagName("dCMark").item(0).getTextContent());
+            ps.setString(2, closingAvailableBalance.getElementsByTagName("date").item(0).getTextContent());
+            ps.setString(3, closingAvailableBalance.getElementsByTagName("currency").item(0).getTextContent());
+            ps.setString(4, closingAvailableBalance.getElementsByTagName("amount").item(0).getTextContent());
+            ps.setString(5, "closingAvailableBalance"); //type
+            ps.setInt(6, fileId); //File_id
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        NodeList openingBalanceTag = tags.getElementsByTagName("openingBalance");
+        Element openingBalance = (Element) openingBalanceTag.item(0);
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sqlBalance);
+            ps.setString(1, (String) openingBalance.getElementsByTagName("dCMark").item(0).getTextContent());
+            ps.setString(2, (String) openingBalance.getElementsByTagName("date").item(0).getTextContent());
+            ps.setString(3, (String) openingBalance.getElementsByTagName("currency").item(0).getTextContent());
+            ps.setString(4, (String) openingBalance.getElementsByTagName("amount").item(0).getTextContent());
+            ps.setString(5, "openingBalance"); //type
+            ps.setInt(6, fileId); //File_id
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        NodeList forwardAvailableBalancesTag = tags.getElementsByTagName("forwardAvailableBalance");
+
+        for(int n = 0; n <forwardAvailableBalancesTag.getLength(); n++){
+            PreparedStatement ps = connection.prepareStatement(sqlBalance);
+            Element forwardAvailableBalance = (Element) forwardAvailableBalancesTag.item(n);
+            try{
+                ps.setString(1, forwardAvailableBalance.getElementsByTagName("dCMark").item(0).getTextContent());
+                ps.setString(2, forwardAvailableBalance.getElementsByTagName("date").item(0).getTextContent());
+                ps.setString(3, forwardAvailableBalance.getElementsByTagName("currency").item(0).getTextContent());
+                ps.setString(4, forwardAvailableBalance.getElementsByTagName("amount").item(0).getTextContent());
+                ps.setString(5, "forwardAvailableBalance"); //type
+                ps.setInt(6, fileId); //File_id
+                ps.executeUpdate();
+            }catch (SQLException e){
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    private void insertIntoTransactionXML(Connection connection, Element tags){
+        
+    }
+
+
 
     private int getFileDescriptionId(Connection connection){
         //get FILE_DESCRIPTION_ID
@@ -295,27 +422,6 @@ public class PostgreSqlController {
             }
         }
     }
-    private void insertIntoFileDescriptionXML(Connection connection){
-
-    }
 
 
-    /*
-    * gets tags from the json and inserts it into postgresql
-    * with stored procedures. does table after table
-    */
-    private void insertInPostgres(JSONObject json) throws SQLException {
-        Connection connection = DriverManager.getConnection(url, user, password);
-        //get tag for the table
-        JSONObject tags = (JSONObject) json.get("tags");
-
-        insertIntoFileDescriptionJSON(connection, tags);
-        insertIntoFileJSON(connection, tags);
-        insertIntoBalanceJSON(connection, tags);
-        insertIntoTransactionJSON(connection, tags);
-
-
-
-
-    }
 }
