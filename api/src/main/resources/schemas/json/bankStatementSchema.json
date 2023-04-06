@@ -100,7 +100,7 @@
               },
               "amount": {
                 "type": "string",
-                "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+                "pattern": "^(0|[1-9]\\d*)(.\\d+)?$",
                 "description": "This pattern checks if amount is a number greater than or equal to 0"
               },
               "dCMark": {
@@ -141,7 +141,7 @@
             },
             "amount": {
               "type": "string",
-              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "pattern": "^(0|[1-9]\\d*)(.\\d+)?$",
               "description": "This pattern checks if amount is a number greater than or equal to 0"
             },
             "dCMark": {
@@ -170,11 +170,11 @@
             },
             "debitEntriesTotalAmount": {
               "type": "string",
-              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$"
+              "pattern": "^(0|[1-9]\\d*)(.\\d+)?$"
             },
             "creditEntriesTotalAmount": {
               "type": "string",
-              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$"
+              "pattern": "^(0|[1-9]\\d*)(.\\d+)?$"
             }
           }
         },
@@ -258,7 +258,7 @@
             },
             "amount": {
               "type": "string",
-              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "pattern": "^(0|[1-9]\\d*)(.\\d+)?$",
               "description": "This pattern checks if amount is a number greater than or equal to 0"
             },
             "dCMark": {
@@ -292,13 +292,14 @@
               },
               "amount": {
                 "type": "string",
-                "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+                "pattern": "^(0|[1-9]\\d*)(.\\d+)?$",
                 "description": "This pattern checks if amount is a number greater than or equal to 0"
               },
               "entryDate": {
                 "type": "string",
                 "maxLength": 4,
-                "minLength": 4
+                "minLength": 4,
+                "pattern": "^\\d{4}$"
               },
               "informationToAccountOwner": {
                 "title": "Schema for the optional 86 tag inside a transaction (61 tag)",
@@ -431,7 +432,7 @@
             },
             "amount": {
               "type": "string",
-              "pattern": "^(0|[1-9]\\d*)(,\\d+)?$",
+              "pattern": "^(0|[1-9]\\d*)(.\\d+)?$",
               "description": "This pattern checks if amount is a number greater than or equal to 0"
             },
             "name": {

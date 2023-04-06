@@ -125,7 +125,7 @@ CREATE TABLE "public"."transaction" (
 ) WITH (oids = false);
 
 INSERT INTO "transaction" ("t_id", "value_date", "entry_date", "debit_credit", "amount", "transaction_code", "reference_owner", "institution_reference", "supplementary_details", "original_description_id", "description", "file_id", "category_id") VALUES
-(1,	'2020-05-22',	'522',	'c',	'$254.00',	'fds',	'hgfd',	'gfd',	'gfd',	1,	'Dit gaat een heel verhaal zijn, om te testen of de beschrijving laten zien op de frontend het doet.',	1,	1),
+(1,	'2020-05-22',	'0522',	'c',	'$254.00',	'fds',	'hgfd',	'gfd',	'gfd',	1,	'Dit gaat een heel verhaal zijn, om te testen of de beschrijving laten zien op de frontend het doet.',	1,	1)
 (2,	'2023-03-27',	'2703',	'd',	'$123.00',	'259',	'gafd',	'gds',	'hbgfds',	1,	'gfdshbvfdfrghnbv',	1,	1),
 (0,	'2023-03-30',	'8274',	'd',	'$541.00',	'5',	'een referecne',	'34',	'details',	0,	'Dit is een hele goede beschirivjing',	1,	1);
 
@@ -193,4 +193,4 @@ CREATE VIEW "transactionsview" AS SELECT transaction.t_id,
      JOIN category ON ((transaction.category_id = category.c_id)))
      JOIN description ON ((transaction.original_description_id = description.d_id)));
 
--- 2023-04-05 07:31:54.095954+00
+-- 2023-04-04 13:15:20.913557+00

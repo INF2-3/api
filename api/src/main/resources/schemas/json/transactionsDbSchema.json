@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://quintor.com/transactionsTable.json",
+  "title": "transactions data for table schema",
+  "type": "array",
+  "items":{
+    "$id": "#root/items",
+    "type": "object",
+    "required": [
+      "amount",
+      "entryDate",
+      "debitOrCredit",
+      "valueDate",
+      "transactionCode",
+      "id",
+      "originalDescription",
+      "fileId"
+    ],
+    "properties": {
+      "amount": {
+        "$id": "#root/items/amount",
+        "type": "number"
+      },
+      "institutionReference": {
+        "$id": "#root/items/institutionReference",
+        "type": "string"
+      },
+      "entryDate": {
+        "$id": "#root/items/entryDate",
+        "type": "string",
+        "maxLength": 4,
+        "minLength": 4,
+        "pattern": "^\\d{4}$"
+      },
+      "supplementaryDetails": {
+        "$id": "#root/items/supplementaryDetails",
+        "type": "string"
+      },
+      "referenceOwner": {
+        "$id": "#root/items/referenceOwner",
+        "type": "string"
+      },
+      "debitOrCredit": {
+        "$id": "#root/items/debitOrCredit",
+        "type": "string",
+        "enum": ["DEBIT", "CREDIT"]
+      },
+      "description": {
+        "$id": "#root/items/description",
+        "type": "string"
+      },
+      "valueDate": {
+        "$id": "#root/items/valueDate",
+        "type": "string",
+        "pattern": "^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$"
+      },
+      "transactionCode": {
+        "$id": "#root/items/transactionCode",
+        "type": "string"
+      },
+      "id": {
+        "$id": "#root/items/id",
+        "type": "integer"
+      },
+      "category": {
+        "$id": "#root/items/category",
+        "type": "object",
+        "properties": {
+          "name": {
+            "$id": "#root/items/category/name",
+            "type": "string"
+          },
+          "categoryId": {
+            "$id": "#root/items/category/categoryId",
+            "type": "integer"
+          }
+        }
+      },
+      "originalDescription": {
+        "$id": "#root/items/originalDescription",
+        "type": "object",
+        "properties": {
+          "counterpartyId": {
+            "$id": "#root/items/originalDescription/counterpartyId",
+            "type": "string"
+          },
+          "mandateReference": {
+            "$id": "#root/items/originalDescription/mandateReference",
+            "type": "string"
+          },
+          "descriptionId": {
+            "$id": "#root/items/originalDescription/descriptionId",
+            "type": "integer"
+          },
+          "paymentInformationId": {
+            "$id": "#root/items/originalDescription/paymentInformationId",
+            "type": "string"
+          },
+          "exchangeRate": {
+            "$id": "#root/items/originalDescription/exchangeRate",
+            "type": "string"
+          },
+          "ultimateDebitor": {
+            "$id": "#root/items/originalDescription/ultimateDebitor",
+            "type": "string"
+          },
+          "purposeCode": {
+            "$id": "#root/items/originalDescription/purposeCode",
+            "type": "string"
+          },
+          "clientReference": {
+            "$id": "#root/items/originalDescription/clientReference",
+            "type": "string"
+          },
+          "creditorId": {
+            "$id": "#root/items/originalDescription/creditorId",
+            "type": "string"
+          }
+        }
+      },
+      "fileId": {
+        "$id": "#root/items/fileId",
+        "type": "integer"
+      }
+    }
+  }
+}
