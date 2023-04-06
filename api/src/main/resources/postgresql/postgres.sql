@@ -68,12 +68,11 @@ CREATE TABLE "public"."file" (
     "file_description_id" integer NOT NULL,
     "last_updated_user" integer NOT NULL,
     "upload_date" date NOT NULL,
-    "filecol" character varying(45) NOT NULL,
     CONSTRAINT "file_pkey" PRIMARY KEY ("f_id")
 ) WITH (oids = false);
 
-INSERT INTO "file" ("f_id", "transaction_reference_number", "account_number", "statement_number", "file_description_id", "last_updated_user", "upload_date", "filecol") VALUES
-(1,	'1',	'1',	1,	1,	1,	'2023-03-27',	'1');
+INSERT INTO "file" ("f_id", "transaction_reference_number", "account_number", "statement_number", "file_description_id", "last_updated_user", "upload_date") VALUES
+(1,	'1',	'1',	1,	1,	1,	'2023-03-27');
 
 DROP TABLE IF EXISTS "file_description";
 DROP SEQUENCE IF EXISTS file_description_id_seq;
@@ -126,7 +125,7 @@ CREATE TABLE "public"."transaction" (
 ) WITH (oids = false);
 
 INSERT INTO "transaction" ("t_id", "value_date", "entry_date", "debit_credit", "amount", "transaction_code", "reference_owner", "institution_reference", "supplementary_details", "original_description_id", "description", "file_id", "category_id") VALUES
-(1,	'2020-05-22',	'0522',	'c',	'$254.00',	'fds',	'hgfd',	'gfd',	'gfd',	1,	'Dit gaat een heel verhaal zijn, om te testen of de beschrijving laten zien op de frontend het doet.',	1,	1),
+(1,	'2020-05-22',	'0522',	'c',	'$254.00',	'fds',	'hgfd',	'gfd',	'gfd',	1,	'Dit gaat een heel verhaal zijn, om te testen of de beschrijving laten zien op de frontend het doet.',	1,	1)
 (2,	'2023-03-27',	'2703',	'd',	'$123.00',	'259',	'gafd',	'gds',	'hbgfds',	1,	'gfdshbvfdfrghnbv',	1,	1),
 (0,	'2023-03-30',	'8274',	'd',	'$541.00',	'5',	'een referecne',	'34',	'details',	0,	'Dit is een hele goede beschirivjing',	1,	1);
 
