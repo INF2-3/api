@@ -42,6 +42,9 @@ public class ConnectionPostgres {
         String sql = "SELECT * FROM transactionsview";
         ResultSet result = ConnectionPostgres.createConnection(sql);
 
+        if (result == null) {
+            return new ArrayList<>();
+        }
         while (result.next()) {
             int id = result.getInt("t_id");
             LocalDate valueDate = result.getDate("t_value_date").toLocalDate();
@@ -103,6 +106,9 @@ public class ConnectionPostgres {
         String sql = "SELECT * FROM bankstatementsview";
         ResultSet result = ConnectionPostgres.createConnection(sql);
 
+        if (result == null) {
+            return new ArrayList<>();
+        }
         while (result.next()) {
             int id = result.getInt("f_id");
             String transActionReferenceNumber = result.getString("f_transaction_reference_number");

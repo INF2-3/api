@@ -1,0 +1,76 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="bankStatement" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:int" name="id"/>
+              <xs:element type="transactionReferenceNumberType" name="transactionReferenceNumber"/>
+              <xs:element type="xs:string" name="accountNumber"/>
+              <xs:element type="xs:short" name="statementNumber"/>
+              <xs:element name="fileDescription">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element type="xs:int" name="id"/>
+                    <xs:element type="xs:integer" name="numberOfDebitEntries"/>
+                    <xs:element type="xs:integer" name="numberOfCreditEntries"/>
+                    <xs:element type="xs:integer" name="amountOfDebitEntries"/>
+                    <xs:element type="xs:integer" name="amountOfCreditEntries"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="lastUpdatedUser">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element type="xs:int" name="id"/>
+                    <xs:element type="xs:string" name="email"/>
+                    <xs:element type="xs:int" name="roleId"/>
+                    <xs:element type="xs:string" name="userName"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+              <xs:element type="xs:date" name="uploadDate"/>
+              <xs:element name="closingBalance">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element type="xs:int" name="id"/>
+                    <xs:element type="debitCreditType" name="debitOrCredit"/>
+                    <xs:element type="xs:date" name="date"/>
+                    <xs:element type="currencyType" name="currency"/>
+                    <xs:element type="xs:double" name="amount"/>
+                    <xs:element type="closingBalanceType" name="type"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="debitCreditType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CREDIT"/>
+      <xs:enumeration value="DEBIT"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="transactionReferenceNumberType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="16"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="currencyType">
+    <xs:restriction base="xs:string">
+      <xs:length value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="closingBalanceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OPENING"/>
+      <xs:enumeration value="CLOSING"/>
+      <xs:enumeration value="CLOSING_AVAILABLE"/>
+      <xs:enumeration value="FORWARD_AVAILABLE"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
