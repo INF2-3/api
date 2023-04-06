@@ -2,7 +2,7 @@
 
 DROP TABLE IF EXISTS "balance";
 DROP SEQUENCE IF EXISTS balance_id_seq;
-CREATE SEQUENCE balance_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE SEQUENCE balance_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 4 CACHE 1;
 
 CREATE TABLE "public"."balance" (
     "b_id" integer DEFAULT nextval('balance_id_seq') NOT NULL,
@@ -19,10 +19,11 @@ INSERT INTO "balance" ("b_id", "b_debit_credit", "b_date", "b_currency", "b_amou
 (1,	'c',	'2023-02-11',	'EUR',	1843.16,	'forwardAvailableBalance',	1),
 (2,	'c',	'2023-02-14',	'EUR',	1843.16,	'forwardAvailableBalance',	1),
 (3,	'c',	'2023-02-10',	'EUR',	1843.16,	'closingAvailableBalance',	1),
-(4,	'c',	'2023-02-10',	'EUR',	1843.16,	'closingBalance',	1);
+(4,	'c',	'2023-02-10',	'EUR',	1843.16,	'closingBalance',	1),
+(5,	'c',	'2023-02-10',	'EUR',	1843.16,	'closingBalance',	2);
 
 DROP VIEW IF EXISTS "bankstatementsview";
-CREATE TABLE "bankstatementsview" ("f_id" integer, "f_transaction_reference_number" character varying(16), "f_account_number" character varying(35), "f_statement_number" integer, "f_file_description_id" integer, "f_last_updated_user" integer, "f_upload_date" date, "f_d_id" integer, "f_d_number_of_debit_entries" integer, "f_d_number_of_credit_entries" integer, "f_d_amount_of_debit_entries" numeric, "f_d_amount_of_credit_entries" numeric, "u_id" integer, "u_email" character varying(255), "u_role_id" integer, "u_username" character varying(255));
+CREATE TABLE "bankstatementsview" ("f_id" integer, "f_transaction_reference_number" character varying(16), "f_account_number" character varying(35), "f_statement_number" integer, "f_file_description_id" integer, "f_last_updated_user" integer, "f_upload_date" date, "f_d_id" integer, "f_d_number_of_debit_entries" integer, "f_d_number_of_credit_entries" integer, "f_d_amount_of_debit_entries" numeric, "f_d_amount_of_credit_entries" numeric, "u_id" integer, "u_email" character varying(255), "u_role_id" integer, "u_username" character varying(255), "b_id" integer, "b_debit_credit" character(1), "b_date" date, "b_currency" character varying(3), "b_amount" numeric, "b_type" character varying(25), "b_file_id" integer);
 
 
 DROP TABLE IF EXISTS "category";
@@ -67,7 +68,7 @@ INSERT INTO "description" ("d_id", "d_return_reason", "d_client_reference", "d_e
 
 DROP TABLE IF EXISTS "file";
 DROP SEQUENCE IF EXISTS file_id_seq;
-CREATE SEQUENCE file_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+CREATE SEQUENCE file_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
 
 CREATE TABLE "public"."file" (
     "f_id" integer DEFAULT nextval('file_id_seq') NOT NULL,
@@ -82,7 +83,8 @@ CREATE TABLE "public"."file" (
 
 INSERT INTO "file" ("f_id", "f_transaction_reference_number", "f_account_number", "f_statement_number", "f_file_description_id", "f_last_updated_user", "f_upload_date") VALUES
 (0,	'1',	'1',	1,	0,	1,	'2023-03-27'),
-(1,	'P230210000000001',	'NL65RABO0224663562EUR',	13040,	1,	1,	'2023-04-05');
+(1,	'P230210000000001',	'NL65RABO0224663562EUR',	13040,	1,	1,	'2023-04-05'),
+(2,	'P230210000000001',	'NL65RABO0224663562EUR',	13040,	1,	1,	'2023-04-05');
 
 DROP TABLE IF EXISTS "file_description";
 DROP SEQUENCE IF EXISTS file_description_id_seq;
@@ -183,10 +185,19 @@ CREATE VIEW "bankstatementsview" AS SELECT file.f_id,
     "user".u_id,
     "user".u_email,
     "user".u_role_id,
-    "user".u_username
-   FROM ((file
+    "user".u_username,
+    balance.b_id,
+    balance.b_debit_credit,
+    balance.b_date,
+    balance.b_currency,
+    balance.b_amount,
+    balance.b_type,
+    balance.b_file_id
+   FROM (((file
      JOIN file_description ON ((file.f_file_description_id = file_description.f_d_id)))
-     JOIN "user" ON ((file.f_last_updated_user = "user".u_id)));
+     JOIN "user" ON ((file.f_last_updated_user = "user".u_id)))
+     JOIN balance ON ((file.f_id = balance.b_file_id)))
+  WHERE ((balance.b_type)::text = 'closingBalance'::text);
 
 DROP TABLE IF EXISTS "transactionsview";
 CREATE VIEW "transactionsview" AS SELECT transaction.t_id,
@@ -223,4 +234,4 @@ CREATE VIEW "transactionsview" AS SELECT transaction.t_id,
      JOIN description ON ((transaction.t_original_description_id = description.d_id)))
      LEFT JOIN category ON ((transaction.t_category_id = category.c_id)));
 
--- 2023-04-05 13:38:51.319485+00
+-- 2023-04-05 20:27:58.535383+00
