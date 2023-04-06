@@ -44,8 +44,8 @@ public class PostgreSqlController {
             return "wrong_user_id";
         }
 
-        //String jsonString = parserJSON(file);
-        //JSONObject json = new JSONObject(jsonString);
+//        String jsonString = parserJSON(file);
+//        JSONObject json = new JSONObject(jsonString);
 
         String xmlString = parserXML(file);
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -119,6 +119,7 @@ public class PostgreSqlController {
         insertIntoFileDescriptionXML(connection, tags);
         insertIntoFileXML(connection, tags);
         insertIntoBalanceXML(connection, tags);
+        insertIntoTransactionXML(connection, tags);
 
     }
 
@@ -216,7 +217,72 @@ public class PostgreSqlController {
         }
     }
     private void insertIntoTransactionXML(Connection connection, Element tags){
-        
+        int fileId = getFileId(connection);
+
+
+        //transactions
+
+//        JSONArray transactions = (JSONArray) tags.get("transactions");
+
+        NodeList transactions = tags.getElementsByTagName("transactions");
+
+        for(int n = 0; n < transactions.getLength(); n++) {
+            Element transaction = (Element) transactions.item(0);
+            NodeList descriptionTag = transaction.getElementsByTagName("informationToAccountOwner");
+            Element description = (Element) descriptionTag.item(0);
+            System.out.println(transaction.getTextContent());
+            System.out.println(description.getTextContent());
+            try {
+                //insert description
+                String sqlDescription = "CALL Insert_description( ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar);";
+                PreparedStatement psd = connection.prepareStatement(sqlDescription, Statement.RETURN_GENERATED_KEYS);
+                psd.setString(1, description.getElementsByTagName("returnReason").item(0).getTextContent()); //return_reason
+                psd.setString(2, description.getElementsByTagName("clientReference").item(0).getTextContent()); //client_reference
+                psd.setString(3, description.getElementsByTagName("endToEndReference").item(0).getTextContent()); //end_to_end_reference
+                psd.setString(4, description.getElementsByTagName("paymentInformationId").item(0).getTextContent()); //payment_information_id
+                psd.setString(5, description.getElementsByTagName("instructionId").item(0).getTextContent()); //instruction_id
+                psd.setString(6, description.getElementsByTagName("mandateReference").item(0).getTextContent()); //mandate_reference
+                psd.setString(7, description.getElementsByTagName("creditorId").item(0).getTextContent()); //creditor_id
+                psd.setString(8, description.getElementsByTagName("counterPartyId").item(0).getTextContent()); //counterparty_id
+                psd.setString(9, description.getElementsByTagName("remittanceInformation").item(0).getTextContent()); //remittance_information
+                psd.setString(10, description.getElementsByTagName("purposeCode").item(0).getTextContent()); //purpose_code
+                psd.setString(11, description.getElementsByTagName("ultimateCreditor").item(0).getTextContent()); //ultimate_creditor
+                psd.setString(12, description.getElementsByTagName("ultimateDebitor").item(0).getTextContent()); //ultimate_debtor
+                psd.setString(13, description.getElementsByTagName("exchangeRate").item(0).getTextContent()); //exchange_rate
+                psd.setString(14, description.getElementsByTagName("charges").item(0).getTextContent()); //charges
+                psd.executeUpdate();
+
+                int originalDescriptionId = getOriginalDescriptionId(connection);
+                System.out.println(originalDescriptionId);
+                //insert transaction
+                String sqlTransaction = "CALL Insert_Transaction(?::date, ?::varchar, ?::char, ?::numeric, ?::varchar, ?::int, ?::int, ?::int, ?::varchar, ?::varchar, ?::varchar, ?::varchar)";
+                PreparedStatement ps = connection.prepareStatement(sqlTransaction);
+                ps.setString(1, transaction.getElementsByTagName("valueDate").item(0).getTextContent());
+                ps.setString(2, transaction.getElementsByTagName("entryDate").item(0).getTextContent());
+                ps.setString(3, transaction.getElementsByTagName("debitCreditMark").item(0).getTextContent());
+                ps.setString(4, transaction.getElementsByTagName("amount").item(0).getTextContent());
+                ps.setString(5, transaction.getElementsByTagName("identificationCode").item(0).getTextContent());
+                ps.setInt(6, 	originalDescriptionId);                       //original_description_ID from table description
+                ps.setInt(7, fileId);
+                ps.setInt(8, 1);
+                if (transaction.hasAttribute("referenceForTheAccountOwner")) {
+                    ps.setString(9, transaction.getElementsByTagName("referenceForTheAccountOwner").item(0).getTextContent());
+                }
+                if (transaction.hasAttribute("referenceOfTheAccountServicingInstitution")) {
+                    ps.setString(10, (String) transaction.getElementsByTagName("referenceOfTheAccountServicingInstitution").item(0).getTextContent());
+                }
+                if(transaction.hasAttribute("supplementaryDetails")) {
+                    ps.setString(11, (String) transaction.getElementsByTagName("supplementaryDetails").item(0).getTextContent());
+                } else {
+                    ps.setString(11, "");
+                }
+                ps.setString(12, "");                  //description
+                ps.executeUpdate();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 
