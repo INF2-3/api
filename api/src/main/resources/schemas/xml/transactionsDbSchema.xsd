@@ -11,9 +11,9 @@
                             <xs:element type="debitCreditType" name="debitOrCredit"/>
                             <xs:element type="xs:double" name="amount"/>
                             <xs:element type="xs:string" name="transactionCode"/>
-                            <xs:element type="xs:string" name="referenceOwner"/>
-                            <xs:element type="xs:string" name="institutionReference"/>
-                            <xs:element type="xs:string" name="supplementaryDetails"/>
+                            <xs:element type="xs:string" name="referenceOwner" minOccurs="0"/>
+                            <xs:element type="xs:string" name="institutionReference" minOccurs="0"/>
+                            <xs:element type="xs:string" name="supplementaryDetails" minOccurs="0"/>
                             <xs:element name="originalDescription">
                                 <xs:complexType>
                                     <xs:sequence>
@@ -35,7 +35,7 @@
                                     </xs:sequence>
                                 </xs:complexType>
                             </xs:element>
-                            <xs:element type="xs:string" name="description"/>
+                            <xs:element type="xs:string" name="description" minOccurs="0"/>
                             <xs:element type="xs:int" name="fileId"/>
                             <xs:element name="category">
                                 <xs:complexType>
