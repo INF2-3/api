@@ -2,10 +2,8 @@ package com.quintor.api.postgreSqlConnection;
 
 import com.quintor.api.validators.JSONSchemaValidator;
 import com.quintor.api.validators.SchemaValidator;
-//import net.minidev.json.JSONArray;
-//import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
-//import net.minidev.json.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,15 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.json.JSONObject;
-import org.json.JSONArray;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("api/postgres")
@@ -42,13 +35,13 @@ public class PostgreSqlController {
         if (userId <= 0) {
             return "wrong_user_id";
         }
+
         String jsonString = parser(file);
-//        JSONParser parser = new JSONParser();
         JSONObject json = new JSONObject(jsonString);
+
         // Step 1: Establishing a Connection
         try (Connection connection = DriverManager.getConnection(url, user, password)){
              // Step 2:Create a statement using connection object
-            assert json != null;
             insertInPostgres(json);
 
             // Step 3: Execute the query or update query
@@ -71,7 +64,6 @@ public class PostgreSqlController {
         MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
         SchemaValidator schemaValidator = new JSONSchemaValidator();
         String result = schemaValidator.validateFormat(multipartFile, "bankStatementSchema");
-        System.out.println(result);
         return result;
     }
 
@@ -102,15 +94,55 @@ public class PostgreSqlController {
         }
     }
 
-    /*
-    * gets tags from the json and inserts it into postgresql
-    * with stored procedures. does table after table
-    */
-    private void insertInPostgres(JSONObject json) throws SQLException {
-        Connection connection = DriverManager.getConnection(url, user, password);
-        //get tag for the table
-        JSONObject tags = (JSONObject) json.get("tags");
+    private int getFileDescriptionId(Connection connection){
+        //get FILE_DESCRIPTION_ID
+        String sqlFileDescriptionId = "SELECT f_d_id FROM file_description ORDER BY f_d_id DESC LIMIT 1";
+        int fileDescriptionId = 0;
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlFileDescriptionId);
+            ResultSet rs = ps.executeQuery();
+            while ( rs.next() ) {
+                fileDescriptionId = Integer.parseInt(rs.getString("f_d_id"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return fileDescriptionId;
+    }
 
+    private int getOriginalDescriptionId(Connection connection){
+        //get FILE_DESCRIPTION_ID
+        String sqlFileDescriptionId = "SELECT d_id FROM description ORDER BY d_id DESC LIMIT 1";
+        int descriptionId = 0;
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlFileDescriptionId);
+            ResultSet rs = ps.executeQuery();
+            while ( rs.next() ) {
+                descriptionId = Integer.parseInt(rs.getString("d_id"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return descriptionId;
+    }
+
+    private int getFileId(Connection connection){
+        //get FILE_ID
+        String sqlFileId = "SELECT f_id FROM file ORDER BY f_id DESC LIMIT 1";
+        int fileId = 0;
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlFileId);
+            ResultSet rs = ps.executeQuery();
+            while ( rs.next() ) {
+                fileId = Integer.parseInt(rs.getString("f_id"));
+//                System.out.println(fileId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return fileId;
+    }
+    private void insertIntoFileDescriptionJSON(Connection connection, JSONObject tags){
         //file_description
         String sqlFileDescription = "CALL insert_file_description(?::int, ?::int, ?::numeric, ?::numeric);";
         JSONObject fileDescription = (JSONObject) tags.get("generalInformationToAccountOwner");
@@ -124,25 +156,15 @@ public class PostgreSqlController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        //file
+    private void insertIntoFileJSON(Connection connection, JSONObject tags){
         String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
         JSONObject accountIdentification = (JSONObject) tags.get("accountIdentification");
         JSONObject transactionReferenceNumber = (JSONObject) tags.get("transactionReferenceNumber");
         JSONObject statementNumber = (JSONObject) tags.get("statementNumber");
 
-        //get FILE_DESCRIPTION_ID
-        String sqlFileDescriptionId = "SELECT f_d_id FROM file_description ORDER BY f_d_id DESC LIMIT 1";
-        int fileDescriptionId = 0;
-        try{
-            PreparedStatement ps = connection.prepareStatement(sqlFileDescriptionId);
-            ResultSet rs = ps.executeQuery();
-            while ( rs.next() ) {
-                fileDescriptionId = Integer.parseInt(rs.getString("f_d_id"));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        int fileDescriptionId = getFileDescriptionId(connection);
 
         try{
             PreparedStatement ps = connection.prepareStatement(sqlFile);
@@ -157,22 +179,11 @@ public class PostgreSqlController {
             throw new RuntimeException(e);
         }
 
-        //get FILE_ID
-        String sqlFileId = "SELECT f_id FROM file ORDER BY f_id DESC LIMIT 1";
-        int fileId = 0;
-        try{
-            PreparedStatement ps = connection.prepareStatement(sqlFileId);
-            ResultSet rs = ps.executeQuery();
-            while ( rs.next() ) {
-                fileId = Integer.parseInt(rs.getString("f_id"));
-//                System.out.println(fileId);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    }
 
 
-
+    private void insertIntoBalanceJSON(Connection connection, JSONObject tags) throws SQLException {
+        int fileId = getFileId(connection);
         //balance
         String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::numeric, ?::varchar,  ?::int);";
         JSONObject closingAvailableBalance = (JSONObject) tags.get("closingAvailableBalance");
@@ -220,6 +231,10 @@ public class PostgreSqlController {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private void insertIntoTransactionJSON(Connection connection, JSONObject tags){
+        int fileId = getFileId(connection);
 
 
         //transactions
@@ -227,32 +242,30 @@ public class PostgreSqlController {
         for(int n = 0; n < transactions.length(); n++) {
             //get descriptionID!!!
             try {
-            JSONObject transaction = (JSONObject) transactions.get(n);
-            JSONObject description = (JSONObject) transaction.get("informationToAccountOwner");
-            String sqlDescription = "CALL Insert_description( ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar);";
-            PreparedStatement psd = connection.prepareStatement(sqlDescription, Statement.RETURN_GENERATED_KEYS);
-            psd.setString(1, (String) description.get("returnReason")); //return_reason
-            psd.setString(2, (String) description.get("clientReference")); //client_reference
-            psd.setString(3, (String) description.get("endToEndReference")); //end_to_end_reference
-            psd.setString(4, (String) description.get("paymentInformationId")); //payment_information_id
-            psd.setString(5, (String) description.get("instructionId")); //instruction_id
-            psd.setString(6, (String) description.get("mandateReference")); //mandate_reference
-            psd.setString(7, (String) description.get("creditorId")); //creditor_id
-            psd.setString(8, (String) description.get("counterPartyId")); //counterparty_id
-            psd.setString(9, (String) description.get("remittanceInformation")); //remittance_information
-            psd.setString(10, (String) description.get("purposeCode")); //purpose_code
-            psd.setString(11, (String) description.get("ultimateCreditor")); //ultimate_creditor
-            psd.setString(12, (String) description.get("ultimateDebitor")); //ultimate_debtor
-            psd.setString(13, (String) description.get("exchangeRate")); //exchange_rate
-            psd.setString(14, (String) description.get("charges")); //charges
-//            psd.executeUpdate();
+                //insert description
+                JSONObject transaction = (JSONObject) transactions.get(n);
+                JSONObject description = (JSONObject) transaction.get("informationToAccountOwner");
+                String sqlDescription = "CALL Insert_description( ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar);";
+                PreparedStatement psd = connection.prepareStatement(sqlDescription, Statement.RETURN_GENERATED_KEYS);
+                psd.setString(1, (String) description.get("returnReason")); //return_reason
+                psd.setString(2, (String) description.get("clientReference")); //client_reference
+                psd.setString(3, (String) description.get("endToEndReference")); //end_to_end_reference
+                psd.setString(4, (String) description.get("paymentInformationId")); //payment_information_id
+                psd.setString(5, (String) description.get("instructionId")); //instruction_id
+                psd.setString(6, (String) description.get("mandateReference")); //mandate_reference
+                psd.setString(7, (String) description.get("creditorId")); //creditor_id
+                psd.setString(8, (String) description.get("counterPartyId")); //counterparty_id
+                psd.setString(9, (String) description.get("remittanceInformation")); //remittance_information
+                psd.setString(10, (String) description.get("purposeCode")); //purpose_code
+                psd.setString(11, (String) description.get("ultimateCreditor")); //ultimate_creditor
+                psd.setString(12, (String) description.get("ultimateDebitor")); //ultimate_debtor
+                psd.setString(13, (String) description.get("exchangeRate")); //exchange_rate
+                psd.setString(14, (String) description.get("charges")); //charges
+                psd.executeUpdate();
 
-            ResultSet rs = psd.executeQuery();
-            int descriptionId = 0;
-            if (rs.next()) {
-                descriptionId = rs.getInt(1);
-            }
-
+                int originalDescriptionId = getOriginalDescriptionId(connection);
+                System.out.println(originalDescriptionId);
+                //insert transaction
                 String sqlTransaction = "CALL Insert_Transaction(?::date, ?::varchar, ?::char, ?::numeric, ?::varchar, ?::int, ?::int, ?::int, ?::varchar, ?::varchar, ?::varchar, ?::varchar)";
                 PreparedStatement ps = connection.prepareStatement(sqlTransaction);
                 ps.setString(1, (String) transaction.get("valueDate"));
@@ -260,7 +273,7 @@ public class PostgreSqlController {
                 ps.setString(3, (String) transaction.get("debitCreditMark"));
                 ps.setString(4, (String) transaction.get("amount"));
                 ps.setString(5, (String) transaction.get("identificationCode"));
-                ps.setInt(6, descriptionId);                       //original_description_ID
+                ps.setInt(6, 	originalDescriptionId);                       //original_description_ID from table description
                 ps.setInt(7, fileId);
                 ps.setInt(8, 1);
                 if (transaction.has("referenceForTheAccountOwner")) {
@@ -278,8 +291,31 @@ public class PostgreSqlController {
                 ps.executeUpdate();
 
             } catch (SQLException e) {
-            throw new RuntimeException(e);
+                throw new RuntimeException(e);
+            }
         }
-        }
+    }
+    private void insertIntoFileDescriptionXML(Connection connection){
+
+    }
+
+
+    /*
+    * gets tags from the json and inserts it into postgresql
+    * with stored procedures. does table after table
+    */
+    private void insertInPostgres(JSONObject json) throws SQLException {
+        Connection connection = DriverManager.getConnection(url, user, password);
+        //get tag for the table
+        JSONObject tags = (JSONObject) json.get("tags");
+
+        insertIntoFileDescriptionJSON(connection, tags);
+        insertIntoFileJSON(connection, tags);
+        insertIntoBalanceJSON(connection, tags);
+        insertIntoTransactionJSON(connection, tags);
+
+
+
+
     }
 }

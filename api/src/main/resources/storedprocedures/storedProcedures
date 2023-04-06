@@ -48,8 +48,7 @@ Begin
    c_institution_reference,
    c_supplementary_details,
    c_description
-)
-RETURNING t_id;
+);
 END;
 $$;
 
