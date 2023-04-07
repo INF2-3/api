@@ -1,11 +1,9 @@
 package com.quintor.api.controllers;
 
-import com.quintor.api.dataobjects.BankStatement;
 import com.quintor.api.postgresql.ConnectionPostgres;
 import com.quintor.api.toJson.ToJSON;
 import com.quintor.api.toXml.ToXML;
 import com.quintor.api.validators.JSONSchemaValidator;
-import com.quintor.api.validators.SchemaValidator;
 import com.quintor.api.validators.XMLSchemaValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +14,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/bankStatement/")

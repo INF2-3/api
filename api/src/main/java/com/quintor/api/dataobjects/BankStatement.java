@@ -11,7 +11,6 @@ public class BankStatement {
     private FileDescription fileDescription;
     private User lastUpdatedUser;
     private LocalDate uploadDate;
-//    private HashSet<Balance> forwardAvailableBalances;
     private Balance closingAvailableBalance;
     private Balance closingBalance;
     private Balance openingBalance;
@@ -25,7 +24,6 @@ public class BankStatement {
         setLastUpdatedUser(lastUpdatedUser);
         setUploadDate(uploadDate);
         setClosingBalance(closingBalance);
-//        this.forwardAvailableBalances = new HashSet<>();
     }
 
     public int getId() {
@@ -83,14 +81,6 @@ public class BankStatement {
     public void setUploadDate(LocalDate uploadDate) {
         this.uploadDate = uploadDate;
     }
-
-//    public HashSet<Balance> getForwardAvailableBalances() {
-//        return this.forwardAvailableBalances;
-//    }
-//
-//    public void addForwardAvailableBalance(Balance forwardAvailableBalance) {
-//        this.forwardAvailableBalances.add(forwardAvailableBalance);
-//    }
 
     public Balance getClosingAvailableBalance() {
         return this.closingAvailableBalance;
