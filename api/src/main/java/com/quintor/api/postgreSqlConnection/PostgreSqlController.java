@@ -46,7 +46,7 @@ public class PostgreSqlController {
         if (userId <= 0) {
             return "wrong_user_id";
         }
-        if(Objects.equals(mode, "JSON")){
+        if(mode.equals("JSON")){
             String jsonString = parserJSON(file);
             JSONObject json = new JSONObject(jsonString);
 
@@ -59,7 +59,7 @@ public class PostgreSqlController {
             }
         }
 
-        if(Objects.equals(mode, "XML")){
+        if(mode.equals("XML")){
             String xmlString = parserXML(file);
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
