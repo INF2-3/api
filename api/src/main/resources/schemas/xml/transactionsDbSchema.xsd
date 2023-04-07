@@ -17,7 +17,7 @@
                             <xs:element name="originalDescription">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element type="xs:byte" name="descriptionId"/>
+                                        <xs:element type="xs:int" name="descriptionId"/>
                                         <xs:element type="xs:string" name="returnReason" minOccurs="0"/>
                                         <xs:element type="xs:string" name="clientReference"/>
                                         <xs:element type="xs:string" name="endToEndReference" minOccurs="0"/>
