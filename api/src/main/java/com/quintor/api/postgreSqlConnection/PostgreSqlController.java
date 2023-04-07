@@ -25,6 +25,7 @@ import java.io.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("api/postgres")
@@ -37,7 +38,7 @@ public class PostgreSqlController {
      * It calls the function insertInPostgres(json) if json is not null
      * */
     @PostMapping("/insert")
-    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId) throws IOException, ParserConfigurationException, SAXException {
+    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId, String mode) throws IOException, ParserConfigurationException, SAXException {
 
         if (file == null) {
             return "no_file";
@@ -45,30 +46,35 @@ public class PostgreSqlController {
         if (userId <= 0) {
             return "wrong_user_id";
         }
-
-        String jsonString = parserJSON(file);
-        JSONObject json = new JSONObject(jsonString);
-
-        String xmlString = parserXML(file);
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        Document xml = documentBuilder.parse(new InputSource(new StringReader(xmlString)));
+        if(Objects.equals(mode, "JSON")){
+            String jsonString = parserJSON(file);
+            JSONObject json = new JSONObject(jsonString);
 
 
-        // Step 1: Establishing a Connection
-        try (Connection connection = DriverManager.getConnection(url, user, password)){
-             // Step 2:Create a statement using connection object
-
-            insertInPostgresJSON(json);
-            insertInPostgresXML(xml);
-            // Step 3: Execute the query or update query
-        }catch (SQLException e) {
-
-            // print SQL exception information
-            return e.toString();
+            try (Connection connection = DriverManager.getConnection(url, user, password)){ //Establishing a Connection
+                //Insert into db
+                insertInPostgresJSON(json);
+            }catch (SQLException e) {
+                // print SQL exception information
+                return e.toString();
+            }
         }
 
+        if(Objects.equals(mode, "XML")){
+            String xmlString = parserXML(file);
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document xml = documentBuilder.parse(new InputSource(new StringReader(xmlString)));
 
+
+            try (Connection connection = DriverManager.getConnection(url, user, password)){ //Establishing a Connection
+                //Insert into db
+                insertInPostgresXML(xml);
+            }catch (SQLException e) {
+                // print SQL exception information
+                return e.toString();
+            }
+        }
         return "done";
     }
 
