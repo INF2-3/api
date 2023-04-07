@@ -3,7 +3,7 @@ Create or Replace Procedure Insert_Transaction
    c_value_date date,
    c_entry_date varchar,
    c_debit_credit char,
-   c_amount money,
+   c_amount numeric,
    c_transaction_code varchar,
    c_original_description_id int,
    c_file_id int,
@@ -20,18 +20,18 @@ Begin
    INSERT INTO transaction
  (
    t_id,
-   value_date,
-   entry_date,
-   debit_credit,
-   amount,
-   transaction_code,
-   original_description_id,
-   file_id,
-   category_id,
-   reference_owner,
-   institution_reference,
-   supplementary_details,
-   description
+   t_value_date,
+   t_entry_date,
+   t_debit_credit,
+   t_amount,
+   t_transaction_code,
+   t_original_description_id,
+   t_file_id,
+   t_category_id,
+   t_reference_owner,
+   t_institution_reference,
+   t_supplementary_details,
+   t_description
 )
    Values
  (
@@ -53,31 +53,12 @@ END;
 $$;
 
 
-
-CALL Insert_Transaction
-(
-   '2002-08-30'::date,
-   1245::int,
-   'C'::char,
-   25.12::money,
-   'as12'::varchar,
-   'aaaaaassssssssss'::varchar,
-   'asdfghjklqwertyu'::varchar,
-   'asdasdahskdashjjhkj'::varchar,
-   1::int,
-   'hallo dit is een test'::varchar,
-   1::int,
-   1::int
-)
-
-
-BALANCE
 Create or Replace Procedure Insert_balance
 (IN
    c_debit_credit char,
    c_date date,
    c_currency varchar,
-   c_amount money,
+   c_amount numeric,
    c_type varchar,
    c_file_id int
 )
@@ -88,12 +69,12 @@ Begin
    INSERT INTO balance
  (
    b_id,
-   debit_credit,
-   date,
-   currency,
-   amount,
-   type,
-   file_id
+   b_debit_credit,
+   b_date,
+   b_currency,
+   b_amount,
+   b_type,
+   b_file_id
 )
    Values
  (
@@ -107,20 +88,6 @@ Begin
 );
 END;
 $$;
-
-
-
-
-CALL Insert_balance
-(
-   'D'::char,
-   '2304-02-12'::date,
-   'EUR'::varchar,
-   34.45::money,
-   'Idk what I am doing'::varchar,
-   1::int
-);
-
 
 
 Create or Replace Procedure Insert_Description
@@ -147,20 +114,20 @@ Begin
    INSERT INTO description
  (
    d_id,
-   return_reason,
-   client_reference,
-   end_to_end_reference,
-   payment_information_id,
-   instruction_id,
-   mandate_reference,
-   creditor_id,
-   counterparty_id,
-   remittance_information,
-   purpose_code,
-   ultimate_creditor,
-   ultimate_debtor,
-   exchange_rate,
-   charges
+   d_return_reason,
+   d_client_reference,
+   d_end_to_end_reference,
+   d_payment_information_id,
+   d_instruction_id,
+   d_mandate_reference,
+   d_creditor_id,
+   d_counterparty_id,
+   d_remittance_information,
+   d_purpose_code,
+   d_ultimate_creditor,
+   d_ultimate_debtor,
+   d_exchange_rate,
+   d_charges
 )
    Values
  (
@@ -184,25 +151,6 @@ END;
 $$;
 
 
-
-CALL Insert_description
-(
-   'Da'::varchar,
-   'aD'::varchar,
-   'aD'::varchar,
-   'Da'::varchar,
-   'aD'::varchar,
-   'Da'::varchar,
-   'aD'::varchar,
-   'Da'::varchar,
-   'aD'::varchar,
-   'aD'::varchar,
-   'aD'::varchar,
-   'aD'::varchar,
-   'aD'::varchar
-);
-
-
 Create or Replace Procedure insert_file
 (IN
    c_transaction_reference_number varchar,
@@ -219,12 +167,12 @@ Begin
    INSERT INTO file
  (
    f_id,
-   transaction_reference_number,
-   account_number,
-   statement_number,
-   file_description_id,
-   last_updated_user,
-   upload_date
+   f_transaction_reference_number,
+   f_account_number,
+   f_statement_number,
+   f_file_description_id,
+   f_last_updated_user,
+   f_upload_date
 )
    Values
  (
@@ -239,24 +187,12 @@ Begin
 END;
 $$;
 
-CALL insert_file
-(
-   'AAA'::varchar,
-   'AAA'::varchar,
-   11::int,
-   1::int,
-   1::int,
-   '2343-12-23'::date,
-   'AAA'::varchar
-)
-
-
 Create or Replace Procedure insert_file_description
 (IN
    c_number_of_debit_entries int,
    c_number_of_credit_entries int,
-   c_amount_of_debit_entries money,
-   c_amount_of_credit_entries money
+   c_amount_of_debit_entries numeric,
+   c_amount_of_credit_entries numeric
 )
 
 LANGUAGE plpgsql
@@ -265,10 +201,10 @@ Begin
    INSERT INTO file_description
  (
    f_d_id,
-   number_of_debit_entries,
-   number_of_credit_entries,
-   amount_of_debit_entries,
-   amount_of_credit_entries
+   f_d_number_of_debit_entries,
+   f_d_number_of_credit_entries,
+   f_d_amount_of_debit_entries,
+   f_d_amount_of_credit_entries
 )
    Values
  (
@@ -280,13 +216,5 @@ Begin
 );
 END;
 $$;
-
-CALL insert_file_description
-(
-   12::int,
-   23::int,
-   23.56::money,
-   89.34::money
-);
 
 
