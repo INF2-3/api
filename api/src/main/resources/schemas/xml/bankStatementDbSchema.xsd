@@ -8,7 +8,7 @@
               <xs:element type="xs:int" name="id"/>
               <xs:element type="transactionReferenceNumberType" name="transactionReferenceNumber"/>
               <xs:element type="xs:string" name="accountNumber"/>
-              <xs:element type="xs:short" name="statementNumber"/>
+              <xs:element type="xs:integer" name="statementNumber"/>
               <xs:element name="fileDescription">
                 <xs:complexType>
                   <xs:all>
