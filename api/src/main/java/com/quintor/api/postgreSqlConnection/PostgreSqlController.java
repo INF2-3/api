@@ -30,9 +30,9 @@ import java.util.Objects;
 @RestController
 @RequestMapping("api/postgres")
 public class PostgreSqlController {
-    private final String url = "jdbc:postgresql://localhost:5432/postgres";
-    private final String user = "root";
-    private final String password = "changeme";
+    private static final String url = System.getenv("POSTGRESQL_URL");
+    private static final String user = System.getenv("POSTGRESQL_USER");
+    private static final String password = System.getenv("POSTGRESQL_PASSWORD");
     /*
      * Function inserts MT940 JSON from parser into POSTGRESQL
      * It calls the function insertInPostgres(json) if json is not null
@@ -49,7 +49,6 @@ public class PostgreSqlController {
         if(Objects.equals(mode, "JSON")){
             String jsonString = parserJSON(file);
             JSONObject json = new JSONObject(jsonString);
-
 
             try (Connection connection = DriverManager.getConnection(url, user, password)){ //Establishing a Connection
                 //Insert into db
@@ -461,7 +460,6 @@ public class PostgreSqlController {
                 psd.executeUpdate();
 
                 int originalDescriptionId = getOriginalDescriptionId(connection);
-                System.out.println(originalDescriptionId);
                 //insert transaction
                 String sqlTransaction = "CALL Insert_Transaction(?::date, ?::varchar, ?::char, ?::numeric, ?::varchar, ?::int, ?::int, ?::int, ?::varchar, ?::varchar, ?::varchar, ?::varchar)";
                 PreparedStatement ps = connection.prepareStatement(sqlTransaction);
