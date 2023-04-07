@@ -1,0 +1,3 @@
+CREATE USER read_user WITH PASSWORD 'Root123!';
+GRANT CONNECT ON DATABASE postgres TO read_user;
+GRANT SELECT ON balance, bankstatementsview, category, description, file, file_description, role, transaction, transactionsview, "user" TO read_user;
