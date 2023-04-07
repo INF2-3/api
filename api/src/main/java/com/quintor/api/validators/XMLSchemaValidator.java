@@ -28,7 +28,7 @@ public class XMLSchemaValidator extends SchemaValidator {
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = factory.newSchema(new StreamSource(schemaStream));
         Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(new ByteArrayInputStream(input.toString().getBytes(StandardCharsets.UTF_8))));
+        validator.validate(new StreamSource(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))));
         return input;
     }
 }

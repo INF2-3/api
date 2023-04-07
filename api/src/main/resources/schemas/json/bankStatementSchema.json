@@ -298,7 +298,8 @@
               "entryDate": {
                 "type": "string",
                 "maxLength": 4,
-                "minLength": 4
+                "minLength": 4,
+                "pattern": "^\\d{4}$"
               },
               "informationToAccountOwner": {
                 "title": "Schema for the optional 86 tag inside a transaction (61 tag)",

@@ -30,7 +30,7 @@ public class JSONSchemaValidator extends SchemaValidator {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        JsonNode jsonNode = objectMapper.readTree(input.toString());
+        JsonNode jsonNode = objectMapper.readTree(input);
         Set<ValidationMessage> errors = jsonSchema.validate(jsonNode);
         String errorsCombined = "";
         for (ValidationMessage error : errors) {
