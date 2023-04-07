@@ -26,7 +26,7 @@ public class XMLController {
         try {
             String allBankStatements = ToXML.bankStatementsToXML(ConnectionPostgres.getAllBankStatements());
             XMLSchemaValidator validator = new XMLSchemaValidator();
-            System.out.println(allBankStatements);
+           
             return ResponseEntity.status(HttpStatus.OK)
                     .body(validator.compareToSchema(allBankStatements, "bankStatementDbSchema"));
         } catch (SQLException | SAXException | IOException e) {
