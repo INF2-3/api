@@ -192,6 +192,22 @@ public class PostgreSqlController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        NodeList closingBalanceTag = tags.getElementsByTagName("closingBalance");
+        Element closingBalance = (Element) closingBalanceTag.item(0);
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlBalance);
+            ps.setString(1, closingBalance.getElementsByTagName("dCMark").item(0).getTextContent());
+            ps.setString(2, closingBalance.getElementsByTagName("date").item(0).getTextContent());
+            ps.setString(3, closingBalance.getElementsByTagName("currency").item(0).getTextContent());
+            ps.setString(4, closingBalance.getElementsByTagName("amount").item(0).getTextContent());
+            ps.setString(5, "closingBalance"); //type
+            ps.setInt(6, fileId); //File_id
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         NodeList openingBalanceTag = tags.getElementsByTagName("openingBalance");
         Element openingBalance = (Element) openingBalanceTag.item(0);
 
@@ -355,6 +371,7 @@ public class PostgreSqlController {
     }
 
     private void insertIntoFileJSON(Connection connection, JSONObject tags){
+        LocalDate currentDate = LocalDate.from(getCurrentDate());
         String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
         JSONObject accountIdentification = (JSONObject) tags.get("accountIdentification");
         JSONObject transactionReferenceNumber = (JSONObject) tags.get("transactionReferenceNumber");
@@ -369,7 +386,7 @@ public class PostgreSqlController {
             ps.setString(3, (String) statementNumber.get("statementNumber"));
             ps.setInt(4, fileDescriptionId);
             ps.setInt(5, 1);
-            ps.setString(6, "2300-10-23");
+            ps.setString(6, String.valueOf(currentDate));
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -390,6 +407,20 @@ public class PostgreSqlController {
             ps.setString(3, (String) closingAvailableBalance.get("currency"));
             ps.setString(4, (String) closingAvailableBalance.get("amount"));
             ps.setString(5, "closingAvailableBalance"); //type
+            ps.setInt(6, fileId); //File_id
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        JSONObject closingBalance = (JSONObject) tags.get("closingBalance");
+        try{
+            PreparedStatement ps = connection.prepareStatement(sqlBalance);
+            ps.setString(1, (String) closingBalance.get("dCMark"));
+            ps.setString(2, (String) closingBalance.get("date"));
+            ps.setString(3, (String) closingBalance.get("currency"));
+            ps.setString(4, (String) closingBalance.get("amount"));
+            ps.setString(5, "closingBalance"); //type
             ps.setInt(6, fileId); //File_id
             ps.executeUpdate();
         } catch (SQLException e) {
