@@ -38,7 +38,7 @@ public class PostgreSqlController {
      * It calls the function insertInPostgres(json) if json is not null
      * */
     @PostMapping("/insert")
-    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId, String mode) throws IOException, ParserConfigurationException, SAXException {
+    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId, @RequestParam("mode") String mode) throws IOException, ParserConfigurationException, SAXException {
 
         if (file == null) {
             return "no_file";
