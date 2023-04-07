@@ -23,6 +23,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("api/postgres")
@@ -44,8 +46,8 @@ public class PostgreSqlController {
             return "wrong_user_id";
         }
 
-//        String jsonString = parserJSON(file);
-//        JSONObject json = new JSONObject(jsonString);
+        String jsonString = parserJSON(file);
+        JSONObject json = new JSONObject(jsonString);
 
         String xmlString = parserXML(file);
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -56,8 +58,9 @@ public class PostgreSqlController {
         // Step 1: Establishing a Connection
         try (Connection connection = DriverManager.getConnection(url, user, password)){
              // Step 2:Create a statement using connection object
-            //insertInPostgresJSON(json);
-                insertInPostgresXML(xml);
+
+            insertInPostgresJSON(json);
+            insertInPostgresXML(xml);
             // Step 3: Execute the query or update query
         }catch (SQLException e) {
 
@@ -141,6 +144,7 @@ public class PostgreSqlController {
     }
 
     private void insertIntoFileXML(Connection connection, Element tags){
+        LocalDate currentDate = LocalDate.from(getCurrentDate());
         String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
 
         NodeList accountIdentificationTag = tags.getElementsByTagName("accountIdentification");
@@ -159,7 +163,7 @@ public class PostgreSqlController {
             ps.setString(3, statementNumber.getElementsByTagName("statementNumber").item(0).getTextContent());
             ps.setInt(4, fileDescriptionId);
             ps.setInt(5, 1);
-            ps.setString(6, "2300-10-23");
+            ps.setDate(6, Date.valueOf(currentDate)); //now date
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -188,10 +192,10 @@ public class PostgreSqlController {
 
         try {
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
-            ps.setString(1, (String) openingBalance.getElementsByTagName("dCMark").item(0).getTextContent());
-            ps.setString(2, (String) openingBalance.getElementsByTagName("date").item(0).getTextContent());
-            ps.setString(3, (String) openingBalance.getElementsByTagName("currency").item(0).getTextContent());
-            ps.setString(4, (String) openingBalance.getElementsByTagName("amount").item(0).getTextContent());
+            ps.setString(1, openingBalance.getElementsByTagName("dCMark").item(0).getTextContent());
+            ps.setString(2, openingBalance.getElementsByTagName("date").item(0).getTextContent());
+            ps.setString(3, openingBalance.getElementsByTagName("currency").item(0).getTextContent());
+            ps.setString(4, openingBalance.getElementsByTagName("amount").item(0).getTextContent());
             ps.setString(5, "openingBalance"); //type
             ps.setInt(6, fileId); //File_id
             ps.executeUpdate();
@@ -219,19 +223,12 @@ public class PostgreSqlController {
     private void insertIntoTransactionXML(Connection connection, Element tags){
         int fileId = getFileId(connection);
 
-
         //transactions
-
-//        JSONArray transactions = (JSONArray) tags.get("transactions");
-
-        NodeList transactions = tags.getElementsByTagName("transactions");
-
+        NodeList transactions = tags.getElementsByTagName("transaction");
         for(int n = 0; n < transactions.getLength(); n++) {
             Element transaction = (Element) transactions.item(0);
             NodeList descriptionTag = transaction.getElementsByTagName("informationToAccountOwner");
             Element description = (Element) descriptionTag.item(0);
-            System.out.println(transaction.getTextContent());
-            System.out.println(description.getTextContent());
             try {
                 //insert description
                 String sqlDescription = "CALL Insert_description( ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar);";
@@ -253,7 +250,6 @@ public class PostgreSqlController {
                 psd.executeUpdate();
 
                 int originalDescriptionId = getOriginalDescriptionId(connection);
-                System.out.println(originalDescriptionId);
                 //insert transaction
                 String sqlTransaction = "CALL Insert_Transaction(?::date, ?::varchar, ?::char, ?::numeric, ?::varchar, ?::int, ?::int, ?::int, ?::varchar, ?::varchar, ?::varchar, ?::varchar)";
                 PreparedStatement ps = connection.prepareStatement(sqlTransaction);
@@ -265,14 +261,14 @@ public class PostgreSqlController {
                 ps.setInt(6, 	originalDescriptionId);                       //original_description_ID from table description
                 ps.setInt(7, fileId);
                 ps.setInt(8, 1);
-                if (transaction.hasAttribute("referenceForTheAccountOwner")) {
+                if ( transaction.getElementsByTagName("referenceForTheAccountOwner").getLength() > 0 ) {
                     ps.setString(9, transaction.getElementsByTagName("referenceForTheAccountOwner").item(0).getTextContent());
                 }
-                if (transaction.hasAttribute("referenceOfTheAccountServicingInstitution")) {
-                    ps.setString(10, (String) transaction.getElementsByTagName("referenceOfTheAccountServicingInstitution").item(0).getTextContent());
+                if (transaction.getElementsByTagName("referenceOfTheAccountServicingInstitution").getLength() > 0) {
+                    ps.setString(10, transaction.getElementsByTagName("referenceOfTheAccountServicingInstitution").item(0).getTextContent());
                 }
-                if(transaction.hasAttribute("supplementaryDetails")) {
-                    ps.setString(11, (String) transaction.getElementsByTagName("supplementaryDetails").item(0).getTextContent());
+                if(transaction.getElementsByTagName("supplementaryDetails").getLength() > 0) {
+                    ps.setString(11, transaction.getElementsByTagName("supplementaryDetails").item(0).getTextContent());
                 } else {
                     ps.setString(11, "");
                 }
@@ -285,7 +281,9 @@ public class PostgreSqlController {
         }
     }
 
-
+    private LocalDateTime getCurrentDate(){
+        return LocalDateTime.now();
+    }
 
     private int getFileDescriptionId(Connection connection){
         //get FILE_DESCRIPTION_ID
