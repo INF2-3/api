@@ -240,7 +240,7 @@
                                                             </xs:restriction>
                                                         </xs:simpleType>
                                                     </xs:element>
-                                                    <xs:element type="xs:string" name="supplementaryDetails"/>
+                                                    <xs:element type="xs:string" name="supplementaryDetails" minOccurs="0"/>
                                                     <xs:element name="debitCreditMark">
                                                         <xs:simpleType>
                                                             <xs:restriction base="xs:string">
