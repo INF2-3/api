@@ -216,4 +216,230 @@ CREATE VIEW "transactionsview" AS SELECT transaction.t_id,
      JOIN description ON ((transaction.t_original_description_id = description.d_id)))
      LEFT JOIN category ON ((transaction.t_category_id = category.c_id)));
 
+Create or Replace Procedure Insert_Transaction
+(IN
+   c_value_date date,
+   c_entry_date varchar,
+   c_debit_credit char,
+   c_amount numeric,
+   c_transaction_code varchar,
+   c_original_description_id int,
+   c_file_id int,
+   c_category_id int,
+   c_reference_owner varchar DEFAULT NULL,
+   c_institution_reference varchar DEFAULT NULL,
+   c_supplementary_details varchar DEFAULT NULL,
+   c_description varchar DEFAULT NULL
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+INSERT INTO transaction
+(
+    t_id,
+    t_value_date,
+    t_entry_date,
+    t_debit_credit,
+    t_amount,
+    t_transaction_code,
+    t_original_description_id,
+    t_file_id,
+    t_category_id,
+    t_reference_owner,
+    t_institution_reference,
+    t_supplementary_details,
+    t_description
+)
+Values
+    (
+        default,
+        c_value_date,
+        c_entry_date,
+        c_debit_credit,
+        c_amount,
+        c_transaction_code,
+        c_original_description_id,
+        c_file_id,
+        c_category_id,
+        c_reference_owner,
+        c_institution_reference,
+        c_supplementary_details,
+        c_description
+    );
+END;
+$$;
+
+
+Create or Replace Procedure Insert_balance
+(IN
+   c_debit_credit char,
+   c_date date,
+   c_currency varchar,
+   c_amount numeric,
+   c_type varchar,
+   c_file_id int
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+INSERT INTO balance
+(
+    b_id,
+    b_debit_credit,
+    b_date,
+    b_currency,
+    b_amount,
+    b_type,
+    b_file_id
+)
+Values
+    (
+        default,
+        c_debit_credit,
+        c_date,
+        c_currency,
+        c_amount,
+        c_type,
+        c_file_id
+    );
+END;
+$$;
+
+
+Create or Replace Procedure Insert_Description
+(IN
+   c_return_reason varchar DEFAULT NULL,
+   c_client_reference varchar DEFAULT NULL,
+   c_end_to_end_reference varchar DEFAULT NULL,
+   c_payment_information_id varchar DEFAULT NULL,
+   c_instruction_id varchar DEFAULT NULL,
+   c_mandate_reference varchar DEFAULT NULL,
+   c_creditor_id varchar DEFAULT NULL,
+   c_counterparty_id varchar DEFAULT NULL,
+   c_remittance_information varchar DEFAULT NULL,
+   c_purpose_code varchar DEFAULT NULL,
+   c_ultimate_creditor varchar DEFAULT NULL,
+   c_ultimate_debtor varchar DEFAULT NULL,
+   c_exchange_rate varchar DEFAULT NULL,
+   c_charges varchar DEFAULT NULL
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+INSERT INTO description
+(
+    d_id,
+    d_return_reason,
+    d_client_reference,
+    d_end_to_end_reference,
+    d_payment_information_id,
+    d_instruction_id,
+    d_mandate_reference,
+    d_creditor_id,
+    d_counterparty_id,
+    d_remittance_information,
+    d_purpose_code,
+    d_ultimate_creditor,
+    d_ultimate_debtor,
+    d_exchange_rate,
+    d_charges
+)
+Values
+    (
+        default,
+        c_return_reason,
+        c_client_reference,
+        c_end_to_end_reference,
+        c_payment_information_id,
+        c_instruction_id,
+        c_mandate_reference,
+        c_creditor_id,
+        c_counterparty_id,
+        c_remittance_information,
+        c_purpose_code,
+        c_ultimate_creditor,
+        c_ultimate_debtor,
+        c_exchange_rate,
+        c_charges
+    );
+END;
+$$;
+
+
+Create or Replace Procedure insert_file
+(IN
+   c_transaction_reference_number varchar,
+   c_account_number varchar,
+   c_statement_number int,
+   c_file_description_id int,
+   c_last_updated_user int,
+   c_upload_date date
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+INSERT INTO file
+(
+    f_id,
+    f_transaction_reference_number,
+    f_account_number,
+    f_statement_number,
+    f_file_description_id,
+    f_last_updated_user,
+    f_upload_date
+)
+Values
+    (
+        default,
+        c_transaction_reference_number,
+        c_account_number,
+        c_statement_number,
+        c_file_description_id,
+        c_last_updated_user,
+        c_upload_date
+    );
+END;
+$$;
+
+Create or Replace Procedure insert_file_description
+(IN
+   c_number_of_debit_entries int,
+   c_number_of_credit_entries int,
+   c_amount_of_debit_entries numeric,
+   c_amount_of_credit_entries numeric
+)
+
+LANGUAGE plpgsql
+AS $$
+Begin
+INSERT INTO file_description
+(
+    f_d_id,
+    f_d_number_of_debit_entries,
+    f_d_number_of_credit_entries,
+    f_d_amount_of_debit_entries,
+    f_d_amount_of_credit_entries
+)
+Values
+    (
+        default,
+        c_number_of_debit_entries,
+        c_number_of_credit_entries,
+        c_amount_of_debit_entries,
+        c_amount_of_credit_entries
+    );
+END;
+$$;
+
+CREATE USER read_user WITH ENCRYPTED PASSWORD 'Root123!';
+GRANT CONNECT ON DATABASE postgres TO read_user;
+GRANT SELECT ON balance, bankstatementsview, category, description, file, file_description, role, transaction, transactionsview, "user" TO read_user;
+
+CREATE USER penningmeester WITH ENCRYPTED PASSWORD 'penningmeester123!';
+GRANT CONNECT ON DATABASE postgres TO read_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON balance, bankstatementsview, category, description, file, file_description, role, transaction, transactionsview, "user" TO penningmeester;
 -- 2023-04-07 09:24:53.142496+00
