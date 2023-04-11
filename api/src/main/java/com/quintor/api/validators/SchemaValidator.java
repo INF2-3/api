@@ -82,6 +82,6 @@ public abstract class SchemaValidator {
             in.close();
             return response.toString();
         }
-        return null;
+        throw new IOException();
     }
 }

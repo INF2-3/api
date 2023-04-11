@@ -5,7 +5,9 @@ import com.quintor.api.validators.SchemaValidator;
 import com.quintor.api.validators.XMLSchemaValidator;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,45 +42,33 @@ public class PostgreSqlController {
      * It calls the function insertInPostgres(json) if json is not null
      * */
     @PostMapping("/insert")
-    public String insert(@RequestParam("file") File file, @RequestParam("userId") int userId, @RequestParam("mode") String mode) throws IOException, ParserConfigurationException, SAXException {
+    public ResponseEntity<Boolean> insert(@RequestParam("file") File file, @RequestParam("userId") int userId, @RequestParam("mode") String mode) throws IOException, ParserConfigurationException, SAXException {
+        try (Connection connection = DriverManager.getConnection(url, user, password)) {
 
-        if (file == null) {
-            return "no_file";
-        }
-        if (userId <= 0) {
-            return "wrong_user_id";
-        }
-        if (mode.equals("JSON")) {
-            String jsonString = parserJSON(file);
-            JSONObject json = new JSONObject(jsonString);
+            if (file == null || userId <= 0) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+            }
 
-            try (Connection connection = DriverManager.getConnection(url, user, password)) { //Establishing a Connection
-                //Insert into db
+            if (mode.equals("JSON")) {
+                String jsonString = parserJSON(file);
+                JSONObject json = new JSONObject(jsonString);
+
                 insertInPostgresJSON(json);
-            } catch (SQLException e) {
-                // print SQL exception information
-                return e.toString();
             }
-        }
 
-        if (mode.equals("XML")) {
-            String xmlString = parserXML(file);
-//            System.out.println(xmlString);
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-//            Document xml = documentBuilder.parse(new InputSource(new StringReader(xmlString)));
-            InputSource inputSource = new InputSource(new StringReader(xmlString));
-            Document xml = documentBuilder.parse(inputSource);
-//            System.out.println(xml.getElementsByTagName("MT940").item(1).);
-            try (Connection connection = DriverManager.getConnection(url, user, password)) { //Establishing a Connection
-                //Insert into db
+            if (mode.equals("XML")) {
+                String xmlString = parserXML(file);
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                InputSource inputSource = new InputSource(new StringReader(xmlString));
+                Document xml = documentBuilder.parse(inputSource);
+
                 insertInPostgresXML(xml);
-            } catch (SQLException e) {
-                // print SQL exception information
-                return e.toString();
             }
+            return ResponseEntity.status(HttpStatus.OK).body(true);
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
-        return "done";
     }
 
 
@@ -112,24 +102,42 @@ public class PostgreSqlController {
      * with stored procedures. does table after table
      */
     private void insertInPostgresJSON(JSONObject json) throws SQLException {
-        Connection connection = DriverManager.getConnection(url, user, password);
-        //get tag for the table
-        JSONObject tags = (JSONObject) json.get("tags");
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(url, user, password);
+            connection.setAutoCommit(false);
+            JSONObject tags = (JSONObject) json.get("tags");
 
-        insertIntoFileDescriptionJSON(connection, tags);
-        insertIntoFileJSON(connection, tags);
-        insertIntoBalanceJSON(connection, tags);
-        insertIntoTransactionJSON(connection, tags);
+            insertIntoFileDescriptionJSON(connection, tags);
+            insertIntoFileJSON(connection, tags);
+            insertIntoBalanceJSON(connection, tags);
+            insertIntoTransactionJSON(connection, tags);
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
+            connection.close();
+        }
     }
 
     private void insertInPostgresXML(Document xml) throws SQLException {
-        Connection connection = DriverManager.getConnection(url, user, password);
-        //get tags values
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(url, user, password);
+            connection.setAutoCommit(false);
 
-        insertIntoFileDescriptionXML(connection, xml);
-        insertIntoFileXML(connection, xml);
-        insertIntoBalanceXML(connection, xml);
-        insertIntoTransactionXML(connection, xml);
+            insertIntoFileDescriptionXML(connection, xml);
+            insertIntoFileXML(connection, xml);
+            insertIntoBalanceXML(connection, xml);
+            insertIntoTransactionXML(connection, xml);
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
+            connection.close();
+        }
     }
 
     private void insertIntoFileDescriptionXML(Connection connection, Document xml) {
@@ -168,72 +176,50 @@ public class PostgreSqlController {
         }
     }
 
+    private void prepareXMLBalanceInsert(Connection connection, Element balance, PreparedStatement ps) {
+        try {
+            int fileId = getFileId(connection);
+            ps.setString(1, balance.getElementsByTagName("dCMark").item(0).getTextContent());
+            ps.setString(2, balance.getElementsByTagName("date").item(0).getTextContent());
+            ps.setString(3, balance.getElementsByTagName("currency").item(0).getTextContent());
+            ps.setString(4, balance.getElementsByTagName("amount").item(0).getTextContent());
+            ps.setString(5, balance.getNodeName()); //type
+            ps.setInt(6, fileId); //File_id
+            ps.addBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void insertIntoBalanceXML(Connection connection, Document xml) throws SQLException {
-        int fileId = getFileId(connection);
         //balance
         String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::numeric, ?::varchar,  ?::int);";
+
+        // add closingAvailableBalance to prepared statement batch
         NodeList closingAvailableBalanceTag = xml.getElementsByTagName("closingAvailableBalance");
         Element closingAvailableBalance = (Element) closingAvailableBalanceTag.item(0);
-        try {
-            PreparedStatement ps = connection.prepareStatement(sqlBalance);
-            ps.setString(1, closingAvailableBalance.getElementsByTagName("dCMark").item(0).getTextContent());
-            ps.setString(2, closingAvailableBalance.getElementsByTagName("date").item(0).getTextContent());
-            ps.setString(3, closingAvailableBalance.getElementsByTagName("currency").item(0).getTextContent());
-            ps.setString(4, closingAvailableBalance.getElementsByTagName("amount").item(0).getTextContent());
-            ps.setString(5, "closingAvailableBalance"); //type
-            ps.setInt(6, fileId); //File_id
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        PreparedStatement ps = connection.prepareStatement(sqlBalance);
+        prepareXMLBalanceInsert(connection, closingAvailableBalance, ps);
 
+
+        // add closingBalance to prepared statement batch
         NodeList closingBalanceTag = xml.getElementsByTagName("closingBalance");
         Element closingBalance = (Element) closingBalanceTag.item(0);
-        try {
-            PreparedStatement ps = connection.prepareStatement(sqlBalance);
-            ps.setString(1, closingBalance.getElementsByTagName("dCMark").item(0).getTextContent());
-            ps.setString(2, closingBalance.getElementsByTagName("date").item(0).getTextContent());
-            ps.setString(3, closingBalance.getElementsByTagName("currency").item(0).getTextContent());
-            ps.setString(4, closingBalance.getElementsByTagName("amount").item(0).getTextContent());
-            ps.setString(5, "closingBalance"); //type
-            ps.setInt(6, fileId); //File_id
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        prepareXMLBalanceInsert(connection, closingBalance, ps);
 
+        // add openingBalance to prepared statement batch
         NodeList openingBalanceTag = xml.getElementsByTagName("openingBalance");
         Element openingBalance = (Element) openingBalanceTag.item(0);
+        prepareXMLBalanceInsert(connection, openingBalance, ps);
 
-        try {
-            PreparedStatement ps = connection.prepareStatement(sqlBalance);
-            ps.setString(1, openingBalance.getElementsByTagName("dCMark").item(0).getTextContent());
-            ps.setString(2, openingBalance.getElementsByTagName("date").item(0).getTextContent());
-            ps.setString(3, openingBalance.getElementsByTagName("currency").item(0).getTextContent());
-            ps.setString(4, openingBalance.getElementsByTagName("amount").item(0).getTextContent());
-            ps.setString(5, "openingBalance"); //type
-            ps.setInt(6, fileId); //File_id
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
+        // add all forward available balances to prepared statement batch
         NodeList forwardAvailableBalancesTag = xml.getElementsByTagName("forwardAvailableBalance");
-
         for (int n = 0; n < forwardAvailableBalancesTag.getLength(); n++) {
-            PreparedStatement ps = connection.prepareStatement(sqlBalance);
             Element forwardAvailableBalance = (Element) forwardAvailableBalancesTag.item(n);
-            try {
-                ps.setString(1, forwardAvailableBalance.getElementsByTagName("dCMark").item(0).getTextContent());
-                ps.setString(2, forwardAvailableBalance.getElementsByTagName("date").item(0).getTextContent());
-                ps.setString(3, forwardAvailableBalance.getElementsByTagName("currency").item(0).getTextContent());
-                ps.setString(4, forwardAvailableBalance.getElementsByTagName("amount").item(0).getTextContent());
-                ps.setString(5, "forwardAvailableBalance"); //type
-                ps.setInt(6, fileId); //File_id
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            prepareXMLBalanceInsert(connection, forwardAvailableBalance, ps);
         }
+        ps.executeBatch();
     }
 
     private void insertIntoTransactionXML(Connection connection, Document xml) {
@@ -390,70 +376,42 @@ public class PostgreSqlController {
 
     }
 
+    private void prepareJSONBalanceInsert(Connection connection, JSONObject balance, String balanceName, PreparedStatement ps) {
+        try {
+            int fileId = getFileId(connection);
+            ps.setString(1, (String) balance.get("dCMark"));
+            ps.setString(2, (String) balance.get("date"));
+            ps.setString(3, (String) balance.get("currency"));
+            ps.setString(4, (String) balance.get("amount"));
+            ps.setString(5, balanceName); //type
+            ps.setInt(6, fileId); //File_id
+            ps.addBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private void insertIntoBalanceJSON(Connection connection, JSONObject tags) throws SQLException {
-        int fileId = getFileId(connection);
         //balance
         String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::numeric, ?::varchar,  ?::int);";
+        PreparedStatement ps = connection.prepareStatement(sqlBalance);
+
         JSONObject closingAvailableBalance = (JSONObject) tags.get("closingAvailableBalance");
-        try {
-            PreparedStatement ps = connection.prepareStatement(sqlBalance);
-            ps.setString(1, (String) closingAvailableBalance.get("dCMark"));
-            ps.setString(2, (String) closingAvailableBalance.get("date"));
-            ps.setString(3, (String) closingAvailableBalance.get("currency"));
-            ps.setString(4, (String) closingAvailableBalance.get("amount"));
-            ps.setString(5, "closingAvailableBalance"); //type
-            ps.setInt(6, fileId); //File_id
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        prepareJSONBalanceInsert(connection, closingAvailableBalance, "closingAvailableBalance", ps);
 
         JSONObject closingBalance = (JSONObject) tags.get("closingBalance");
-        try {
-            PreparedStatement ps = connection.prepareStatement(sqlBalance);
-            ps.setString(1, (String) closingBalance.get("dCMark"));
-            ps.setString(2, (String) closingBalance.get("date"));
-            ps.setString(3, (String) closingBalance.get("currency"));
-            ps.setString(4, (String) closingBalance.get("amount"));
-            ps.setString(5, "closingBalance"); //type
-            ps.setInt(6, fileId); //File_id
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        prepareJSONBalanceInsert(connection, closingBalance, "closingBalance", ps);
 
         JSONObject openingBalance = (JSONObject) tags.get("openingBalance");
-        try {
-            PreparedStatement ps = connection.prepareStatement(sqlBalance);
-            ps.setString(1, (String) openingBalance.get("dCMark"));
-            ps.setString(2, (String) openingBalance.get("date"));
-            ps.setString(3, (String) openingBalance.get("currency"));
-            ps.setString(4, (String) openingBalance.get("amount"));
-            ps.setString(5, "openingBalance"); //type
-            ps.setInt(6, fileId); //File_id
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        prepareJSONBalanceInsert(connection, openingBalance, "openingBalance", ps);
+
+
         JSONArray forwardAvailableBalances = (JSONArray) tags.get("forwardAvailableBalance");
-
-
         for (int n = 0; n < forwardAvailableBalances.length(); n++) {
-            PreparedStatement ps = connection.prepareStatement(sqlBalance);
             JSONObject forwardAvailableBalance = (JSONObject) forwardAvailableBalances.get(n);
-            try {
-                ps.setString(1, (String) forwardAvailableBalance.get("dCMark"));
-                ps.setString(2, (String) forwardAvailableBalance.get("date"));
-                ps.setString(3, (String) forwardAvailableBalance.get("currency"));
-                ps.setString(4, (String) forwardAvailableBalance.get("amount"));
-                ps.setString(5, "forwardAvailableBalance"); //type
-                ps.setInt(6, fileId); //File_id
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            prepareJSONBalanceInsert(connection, forwardAvailableBalance, "forwardAvailableBalance", ps);
         }
+        ps.executeBatch();
     }
 
     private void insertIntoTransactionJSON(Connection connection, JSONObject tags) {
