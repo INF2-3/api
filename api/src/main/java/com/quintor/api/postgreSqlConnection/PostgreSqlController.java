@@ -82,7 +82,11 @@ public class PostgreSqlController {
             } else {
                 stmt.setString(1, description);
             }
-            stmt.setInt(2, getCategoryId(connection, category));
+            if (category.equals("")) {
+                stmt.setNull(2, Types.NULL);
+            } else {
+                stmt.setInt(2, getCategoryId(connection, category));
+            }
             stmt.setInt(3, transactionId);
             stmt.executeUpdate();
             return ResponseEntity.status(HttpStatus.OK).body(true);
