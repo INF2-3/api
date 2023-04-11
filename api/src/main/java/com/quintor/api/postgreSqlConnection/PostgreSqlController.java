@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -33,6 +34,7 @@ public class PostgreSqlController {
     private static final String url = System.getenv("POSTGRESQL_URL");
     private static final String user = System.getenv("POSTGRESQL_USER");
     private static final String password = System.getenv("POSTGRESQL_PASSWORD");
+
     /*
      * Function inserts MT940 JSON from parser into POSTGRESQL
      * It calls the function insertInPostgres(json) if json is not null
@@ -46,30 +48,32 @@ public class PostgreSqlController {
         if (userId <= 0) {
             return "wrong_user_id";
         }
-        if(mode.equals("JSON")){
+        if (mode.equals("JSON")) {
             String jsonString = parserJSON(file);
             JSONObject json = new JSONObject(jsonString);
 
-            try (Connection connection = DriverManager.getConnection(url, user, password)){ //Establishing a Connection
+            try (Connection connection = DriverManager.getConnection(url, user, password)) { //Establishing a Connection
                 //Insert into db
                 insertInPostgresJSON(json);
-            }catch (SQLException e) {
+            } catch (SQLException e) {
                 // print SQL exception information
                 return e.toString();
             }
         }
 
-        if(mode.equals("XML")){
+        if (mode.equals("XML")) {
             String xmlString = parserXML(file);
+//            System.out.println(xmlString);
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document xml = documentBuilder.parse(new InputSource(new StringReader(xmlString)));
-
-
-            try (Connection connection = DriverManager.getConnection(url, user, password)){ //Establishing a Connection
+//            Document xml = documentBuilder.parse(new InputSource(new StringReader(xmlString)));
+            InputSource inputSource = new InputSource(new StringReader(xmlString));
+            Document xml = documentBuilder.parse(inputSource);
+//            System.out.println(xml.getElementsByTagName("MT940").item(1).);
+            try (Connection connection = DriverManager.getConnection(url, user, password)) { //Establishing a Connection
                 //Insert into db
                 insertInPostgresXML(xml);
-            }catch (SQLException e) {
+            } catch (SQLException e) {
                 // print SQL exception information
                 return e.toString();
             }
@@ -79,9 +83,9 @@ public class PostgreSqlController {
 
 
     /*
-    * sets up connection with parser
-    * and returns String gotten from parser wht getResponse()
-    */
+     * sets up connection with parser
+     * and returns String gotten from parser wht getResponse()
+     */
     private String parserJSON(File file) throws IOException {
         InputStream stream = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
@@ -121,26 +125,22 @@ public class PostgreSqlController {
     private void insertInPostgresXML(Document xml) throws SQLException {
         Connection connection = DriverManager.getConnection(url, user, password);
         //get tags values
-        NodeList nodeList = xml.getElementsByTagName("tags");
-        Element tags = (Element) nodeList.item(0);
 
-        insertIntoFileDescriptionXML(connection, tags);
-        insertIntoFileXML(connection, tags);
-        insertIntoBalanceXML(connection, tags);
-        insertIntoTransactionXML(connection, tags);
-
+        insertIntoFileDescriptionXML(connection, xml);
+        insertIntoFileXML(connection, xml);
+        insertIntoBalanceXML(connection, xml);
+        insertIntoTransactionXML(connection, xml);
     }
 
-    private void insertIntoFileDescriptionXML(Connection connection, Element tags){
+    private void insertIntoFileDescriptionXML(Connection connection, Document xml) {
         String sqlFileDescription = "CALL insert_file_description(?::int, ?::int, ?::numeric, ?::numeric);";
-        NodeList tag = tags.getElementsByTagName("generalInformationToAccountOwner");
-        Element fileDescription = (Element) tag.item(0);
-        try{
+
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlFileDescription);
-            ps.setString(1, fileDescription.getElementsByTagName("numberOfDebitEntries").item(0).getTextContent());
-            ps.setString(2, fileDescription.getElementsByTagName("numberOfCreditEntries").item(0).getTextContent());
-            ps.setString(3, fileDescription.getElementsByTagName("debitEntriesTotalAmount").item(0).getTextContent());
-            ps.setString(4, fileDescription.getElementsByTagName("creditEntriesTotalAmount").item(0).getTextContent());
+            ps.setString(1, xml.getElementsByTagName("numberOfDebitEntries").item(0).getTextContent());
+            ps.setString(2, xml.getElementsByTagName("numberOfCreditEntries").item(0).getTextContent());
+            ps.setString(3, xml.getElementsByTagName("debitEntriesTotalAmount").item(0).getTextContent());
+            ps.setString(4, xml.getElementsByTagName("creditEntriesTotalAmount").item(0).getTextContent());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -148,24 +148,17 @@ public class PostgreSqlController {
 
     }
 
-    private void insertIntoFileXML(Connection connection, Element tags){
+    private void insertIntoFileXML(Connection connection, Document xml) {
         LocalDate currentDate = LocalDate.from(getCurrentDate());
         String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
 
-        NodeList accountIdentificationTag = tags.getElementsByTagName("accountIdentification");
-        Element accountIdentification = (Element) accountIdentificationTag.item(0);
-        NodeList transactionReferenceNumberTag = tags.getElementsByTagName("transactionReferenceNumber");
-        Element transactionReferenceNumber = (Element) transactionReferenceNumberTag.item(0);
-        NodeList statementNumberTag = tags.getElementsByTagName("statementNumber");
-        Element statementNumber = (Element) statementNumberTag.item(0);
-
         int fileDescriptionId = getFileDescriptionId(connection);
 
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlFile);
-            ps.setString(1, transactionReferenceNumber.getElementsByTagName("referenceNumber").item(0).getTextContent());
-            ps.setString(2, accountIdentification.getElementsByTagName("accountNumber").item(0).getTextContent());
-            ps.setString(3, statementNumber.getElementsByTagName("statementNumber").item(0).getTextContent());
+            ps.setString(1, xml.getElementsByTagName("referenceNumber").item(0).getTextContent());
+            ps.setString(2, xml.getElementsByTagName("accountNumber").item(0).getTextContent());
+            ps.setString(3, xml.getElementsByTagName("statementNumber").item(1).getTextContent());
             ps.setInt(4, fileDescriptionId);
             ps.setInt(5, 1);
             ps.setDate(6, Date.valueOf(currentDate)); //now date
@@ -174,13 +167,14 @@ public class PostgreSqlController {
             throw new RuntimeException(e);
         }
     }
-    private void insertIntoBalanceXML(Connection connection, Element tags) throws SQLException {
+
+    private void insertIntoBalanceXML(Connection connection, Document xml) throws SQLException {
         int fileId = getFileId(connection);
         //balance
         String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::numeric, ?::varchar,  ?::int);";
-        NodeList closingAvailableBalanceTag = tags.getElementsByTagName("closingAvailableBalance");
+        NodeList closingAvailableBalanceTag = xml.getElementsByTagName("closingAvailableBalance");
         Element closingAvailableBalance = (Element) closingAvailableBalanceTag.item(0);
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
             ps.setString(1, closingAvailableBalance.getElementsByTagName("dCMark").item(0).getTextContent());
             ps.setString(2, closingAvailableBalance.getElementsByTagName("date").item(0).getTextContent());
@@ -193,9 +187,9 @@ public class PostgreSqlController {
             throw new RuntimeException(e);
         }
 
-        NodeList closingBalanceTag = tags.getElementsByTagName("closingBalance");
+        NodeList closingBalanceTag = xml.getElementsByTagName("closingBalance");
         Element closingBalance = (Element) closingBalanceTag.item(0);
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
             ps.setString(1, closingBalance.getElementsByTagName("dCMark").item(0).getTextContent());
             ps.setString(2, closingBalance.getElementsByTagName("date").item(0).getTextContent());
@@ -208,7 +202,7 @@ public class PostgreSqlController {
             throw new RuntimeException(e);
         }
 
-        NodeList openingBalanceTag = tags.getElementsByTagName("openingBalance");
+        NodeList openingBalanceTag = xml.getElementsByTagName("openingBalance");
         Element openingBalance = (Element) openingBalanceTag.item(0);
 
         try {
@@ -223,12 +217,12 @@ public class PostgreSqlController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        NodeList forwardAvailableBalancesTag = tags.getElementsByTagName("forwardAvailableBalance");
+        NodeList forwardAvailableBalancesTag = xml.getElementsByTagName("forwardAvailableBalance");
 
-        for(int n = 0; n <forwardAvailableBalancesTag.getLength(); n++){
+        for (int n = 0; n < forwardAvailableBalancesTag.getLength(); n++) {
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
             Element forwardAvailableBalance = (Element) forwardAvailableBalancesTag.item(n);
-            try{
+            try {
                 ps.setString(1, forwardAvailableBalance.getElementsByTagName("dCMark").item(0).getTextContent());
                 ps.setString(2, forwardAvailableBalance.getElementsByTagName("date").item(0).getTextContent());
                 ps.setString(3, forwardAvailableBalance.getElementsByTagName("currency").item(0).getTextContent());
@@ -236,18 +230,19 @@ public class PostgreSqlController {
                 ps.setString(5, "forwardAvailableBalance"); //type
                 ps.setInt(6, fileId); //File_id
                 ps.executeUpdate();
-            }catch (SQLException e){
+            } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }
     }
-    private void insertIntoTransactionXML(Connection connection, Element tags){
+
+    private void insertIntoTransactionXML(Connection connection, Document xml) {
         int fileId = getFileId(connection);
 
         //transactions
-        NodeList transactions = tags.getElementsByTagName("transaction");
-        for(int n = 0; n < transactions.getLength(); n++) {
-            Element transaction = (Element) transactions.item(0);
+        NodeList transactions = xml.getElementsByTagName("transaction");
+        for (int n = 0; n < transactions.getLength(); n++) {
+            Element transaction = (Element) transactions.item(n);
             NodeList descriptionTag = transaction.getElementsByTagName("informationToAccountOwner");
             Element description = (Element) descriptionTag.item(0);
             try {
@@ -279,16 +274,16 @@ public class PostgreSqlController {
                 ps.setString(3, transaction.getElementsByTagName("debitCreditMark").item(0).getTextContent());
                 ps.setString(4, transaction.getElementsByTagName("amount").item(0).getTextContent());
                 ps.setString(5, transaction.getElementsByTagName("identificationCode").item(0).getTextContent());
-                ps.setInt(6, 	originalDescriptionId);                       //original_description_ID from table description
+                ps.setInt(6, originalDescriptionId);                       //original_description_ID from table description
                 ps.setInt(7, fileId);
                 ps.setInt(8, 1);
-                if ( transaction.getElementsByTagName("referenceForTheAccountOwner").getLength() > 0 ) {
+                if (transaction.getElementsByTagName("referenceForTheAccountOwner").getLength() > 0) {
                     ps.setString(9, transaction.getElementsByTagName("referenceForTheAccountOwner").item(0).getTextContent());
                 }
                 if (transaction.getElementsByTagName("referenceOfTheAccountServicingInstitution").getLength() > 0) {
                     ps.setString(10, transaction.getElementsByTagName("referenceOfTheAccountServicingInstitution").item(0).getTextContent());
                 }
-                if(transaction.getElementsByTagName("supplementaryDetails").getLength() > 0) {
+                if (transaction.getElementsByTagName("supplementaryDetails").getLength() > 0) {
                     ps.setString(11, transaction.getElementsByTagName("supplementaryDetails").item(0).getTextContent());
                 } else {
                     ps.setString(11, "");
@@ -302,18 +297,18 @@ public class PostgreSqlController {
         }
     }
 
-    private LocalDateTime getCurrentDate(){
+    private LocalDateTime getCurrentDate() {
         return LocalDateTime.now();
     }
 
-    private int getFileDescriptionId(Connection connection){
+    private int getFileDescriptionId(Connection connection) {
         //get FILE_DESCRIPTION_ID
         String sqlFileDescriptionId = "SELECT f_d_id FROM file_description ORDER BY f_d_id DESC LIMIT 1";
         int fileDescriptionId = 0;
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlFileDescriptionId);
             ResultSet rs = ps.executeQuery();
-            while ( rs.next() ) {
+            while (rs.next()) {
                 fileDescriptionId = Integer.parseInt(rs.getString("f_d_id"));
             }
         } catch (SQLException e) {
@@ -322,14 +317,14 @@ public class PostgreSqlController {
         return fileDescriptionId;
     }
 
-    private int getOriginalDescriptionId(Connection connection){
+    private int getOriginalDescriptionId(Connection connection) {
         //get FILE_DESCRIPTION_ID
         String sqlFileDescriptionId = "SELECT d_id FROM description ORDER BY d_id DESC LIMIT 1";
         int descriptionId = 0;
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlFileDescriptionId);
             ResultSet rs = ps.executeQuery();
-            while ( rs.next() ) {
+            while (rs.next()) {
                 descriptionId = Integer.parseInt(rs.getString("d_id"));
             }
         } catch (SQLException e) {
@@ -338,14 +333,14 @@ public class PostgreSqlController {
         return descriptionId;
     }
 
-    private int getFileId(Connection connection){
+    private int getFileId(Connection connection) {
         //get FILE_ID
         String sqlFileId = "SELECT f_id FROM file ORDER BY f_id DESC LIMIT 1";
         int fileId = 0;
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlFileId);
             ResultSet rs = ps.executeQuery();
-            while ( rs.next() ) {
+            while (rs.next()) {
                 fileId = Integer.parseInt(rs.getString("f_id"));
 //                System.out.println(fileId);
             }
@@ -354,11 +349,12 @@ public class PostgreSqlController {
         }
         return fileId;
     }
-    private void insertIntoFileDescriptionJSON(Connection connection, JSONObject tags){
+
+    private void insertIntoFileDescriptionJSON(Connection connection, JSONObject tags) {
         //file_description
         String sqlFileDescription = "CALL insert_file_description(?::int, ?::int, ?::numeric, ?::numeric);";
         JSONObject fileDescription = (JSONObject) tags.get("generalInformationToAccountOwner");
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlFileDescription);
             ps.setString(1, (String) fileDescription.get("numberOfDebitEntries"));
             ps.setString(2, (String) fileDescription.get("numberOfCreditEntries"));
@@ -370,7 +366,7 @@ public class PostgreSqlController {
         }
     }
 
-    private void insertIntoFileJSON(Connection connection, JSONObject tags){
+    private void insertIntoFileJSON(Connection connection, JSONObject tags) {
         LocalDate currentDate = LocalDate.from(getCurrentDate());
         String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
         JSONObject accountIdentification = (JSONObject) tags.get("accountIdentification");
@@ -379,7 +375,7 @@ public class PostgreSqlController {
 
         int fileDescriptionId = getFileDescriptionId(connection);
 
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlFile);
             ps.setString(1, (String) transactionReferenceNumber.get("referenceNumber"));
             ps.setString(2, (String) accountIdentification.get("accountNumber"));
@@ -400,7 +396,7 @@ public class PostgreSqlController {
         //balance
         String sqlBalance = "CALL Insert_balance( ?::char, ?::date, ?::varchar, ?::numeric, ?::varchar,  ?::int);";
         JSONObject closingAvailableBalance = (JSONObject) tags.get("closingAvailableBalance");
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
             ps.setString(1, (String) closingAvailableBalance.get("dCMark"));
             ps.setString(2, (String) closingAvailableBalance.get("date"));
@@ -414,7 +410,7 @@ public class PostgreSqlController {
         }
 
         JSONObject closingBalance = (JSONObject) tags.get("closingBalance");
-        try{
+        try {
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
             ps.setString(1, (String) closingBalance.get("dCMark"));
             ps.setString(2, (String) closingBalance.get("date"));
@@ -443,10 +439,10 @@ public class PostgreSqlController {
         JSONArray forwardAvailableBalances = (JSONArray) tags.get("forwardAvailableBalance");
 
 
-        for(int n = 0; n <forwardAvailableBalances.length(); n++){
+        for (int n = 0; n < forwardAvailableBalances.length(); n++) {
             PreparedStatement ps = connection.prepareStatement(sqlBalance);
             JSONObject forwardAvailableBalance = (JSONObject) forwardAvailableBalances.get(n);
-            try{
+            try {
                 ps.setString(1, (String) forwardAvailableBalance.get("dCMark"));
                 ps.setString(2, (String) forwardAvailableBalance.get("date"));
                 ps.setString(3, (String) forwardAvailableBalance.get("currency"));
@@ -454,19 +450,19 @@ public class PostgreSqlController {
                 ps.setString(5, "forwardAvailableBalance"); //type
                 ps.setInt(6, fileId); //File_id
                 ps.executeUpdate();
-            }catch (SQLException e){
+            } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    private void insertIntoTransactionJSON(Connection connection, JSONObject tags){
+    private void insertIntoTransactionJSON(Connection connection, JSONObject tags) {
         int fileId = getFileId(connection);
 
 
         //transactions
         JSONArray transactions = (JSONArray) tags.get("transactions");
-        for(int n = 0; n < transactions.length(); n++) {
+        for (int n = 0; n < transactions.length(); n++) {
             //get descriptionID!!!
             try {
                 //insert description
@@ -499,7 +495,7 @@ public class PostgreSqlController {
                 ps.setString(3, (String) transaction.get("debitCreditMark"));
                 ps.setString(4, (String) transaction.get("amount"));
                 ps.setString(5, (String) transaction.get("identificationCode"));
-                ps.setInt(6, 	originalDescriptionId);                       //original_description_ID from table description
+                ps.setInt(6, originalDescriptionId);                       //original_description_ID from table description
                 ps.setInt(7, fileId);
                 ps.setInt(8, 1);
                 if (transaction.has("referenceForTheAccountOwner")) {
@@ -508,7 +504,7 @@ public class PostgreSqlController {
                 if (transaction.has("referenceOfTheAccountServicingInstitution")) {
                     ps.setString(10, (String) transaction.get("referenceOfTheAccountServicingInstitution"));
                 }
-                if(transaction.has("supplementaryDetails")) {
+                if (transaction.has("supplementaryDetails")) {
                     ps.setString(11, (String) transaction.get("supplementaryDetails"));
                 } else {
                     ps.setString(11, "");
