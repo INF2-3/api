@@ -71,6 +71,57 @@ public class PostgreSqlController {
         }
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<Boolean> update(@RequestParam("transactionId") int transactionId, @RequestParam("description") String description, @RequestParam("category") String category, @RequestParam("mode") String mode) {
+        try (Connection connection = DriverManager.getConnection(url, user, password)) {
+            String updateSQL = "UPDATE transaction SET t_description = ?, t_category_id = ? WHERE t_id = ?";
+            PreparedStatement stmt = connection.prepareStatement(updateSQL);
+
+            if(description.equals("null")) {
+                stmt.setString(1, "");
+            } else {
+                stmt.setString(1, description);
+            }
+            stmt.setInt(2, getCategoryId(connection, category));
+            stmt.setInt(3, transactionId);
+            stmt.executeUpdate();
+            return ResponseEntity.status(HttpStatus.OK).body(true);
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
+
+    private int getCategoryId(Connection connection, String category) throws SQLException {
+        String getCategory = "SELECT c_id FROM category WHERE c_name = ?";
+        PreparedStatement getCatStmt = connection.prepareStatement(getCategory);
+        getCatStmt.setString(1, category);
+        ResultSet resultSet = getCatStmt.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt("c_id");
+        } else {
+            String createCategory = "INSERT INTO category (c_name) VALUES (?) RETURNING c_id";
+            PreparedStatement createCatStmt = connection.prepareStatement(createCategory, Statement.RETURN_GENERATED_KEYS);
+            createCatStmt.setString(1, category);
+            createCatStmt.executeUpdate();
+            ResultSet rs = createCatStmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            throw new SQLException();
+        }
+    }
+
+    private boolean doesFileExistInDatabase(Connection connection, String referenceNumber) throws SQLException {
+        String sqlSelectFile = "SELECT * FROM file WHERE f_transaction_reference_number = ?";
+        PreparedStatement selectFiles = connection.prepareStatement(sqlSelectFile);
+        selectFiles.setString(1, referenceNumber);
+        ResultSet resultSet = selectFiles.executeQuery();
+        if (resultSet.next()) {
+            return true;
+        }
+        return false;
+    }
+
 
     /*
      * sets up connection with parser
@@ -115,6 +166,7 @@ public class PostgreSqlController {
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
+            throw new SQLException();
         } finally {
             connection.setAutoCommit(true);
             connection.close();
@@ -134,6 +186,7 @@ public class PostgreSqlController {
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
+            throw new SQLException();
         } finally {
             connection.setAutoCommit(true);
             connection.close();
@@ -156,9 +209,13 @@ public class PostgreSqlController {
 
     }
 
-    private void insertIntoFileXML(Connection connection, Document xml) {
+    private void insertIntoFileXML(Connection connection, Document xml) throws SQLException {
         LocalDate currentDate = LocalDate.from(getCurrentDate());
         String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
+
+        if (doesFileExistInDatabase(connection, xml.getElementsByTagName("referenceNumber").item(0).getTextContent())) {
+            throw new SQLException();
+        }
 
         int fileDescriptionId = getFileDescriptionId(connection);
 
@@ -262,7 +319,7 @@ public class PostgreSqlController {
                 ps.setString(5, transaction.getElementsByTagName("identificationCode").item(0).getTextContent());
                 ps.setInt(6, originalDescriptionId);                       //original_description_ID from table description
                 ps.setInt(7, fileId);
-                ps.setInt(8, 1);
+                ps.setNull(8, Types.INTEGER);
                 if (transaction.getElementsByTagName("referenceForTheAccountOwner").getLength() > 0) {
                     ps.setString(9, transaction.getElementsByTagName("referenceForTheAccountOwner").item(0).getTextContent());
                 }
@@ -352,12 +409,17 @@ public class PostgreSqlController {
         }
     }
 
-    private void insertIntoFileJSON(Connection connection, JSONObject tags) {
+    private void insertIntoFileJSON(Connection connection, JSONObject tags) throws SQLException {
+
         LocalDate currentDate = LocalDate.from(getCurrentDate());
         String sqlFile = "CALL insert_file(?::varchar, ?::varchar, ?::int, ?::int, ?::int, ?::date)";
         JSONObject accountIdentification = (JSONObject) tags.get("accountIdentification");
         JSONObject transactionReferenceNumber = (JSONObject) tags.get("transactionReferenceNumber");
         JSONObject statementNumber = (JSONObject) tags.get("statementNumber");
+
+        if(doesFileExistInDatabase(connection, (String) transactionReferenceNumber.get("referenceNumber"))) {
+            throw new SQLException();
+        }
 
         int fileDescriptionId = getFileDescriptionId(connection);
 
@@ -455,7 +517,7 @@ public class PostgreSqlController {
                 ps.setString(5, (String) transaction.get("identificationCode"));
                 ps.setInt(6, originalDescriptionId);                       //original_description_ID from table description
                 ps.setInt(7, fileId);
-                ps.setInt(8, 1);
+                ps.setNull(8, Types.INTEGER);
                 if (transaction.has("referenceForTheAccountOwner")) {
                     ps.setString(9, (String) transaction.get("referenceForTheAccountOwner"));
                 }
