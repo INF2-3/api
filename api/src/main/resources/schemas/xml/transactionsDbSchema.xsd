@@ -37,11 +37,11 @@
                             </xs:element>
                             <xs:element type="xs:string" name="description" minOccurs="0"/>
                             <xs:element type="xs:int" name="fileId"/>
-                            <xs:element name="category">
+                            <xs:element name="category" minOccurs="0">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element type="xs:int" name="categoryId"/>
-                                        <xs:element type="xs:string" name="name"/>
+                                        <xs:element type="xs:int" name="categoryId" minOccurs="0"/>
+                                        <xs:element type="xs:string" name="name" minOccurs="0"/>
                                     </xs:sequence>
                                 </xs:complexType>
                             </xs:element>
